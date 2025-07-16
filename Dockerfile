@@ -1,41 +1,47 @@
-# Dockerfile v1.0.4 - Aplicación Actas Municipales
-FROM caddy:2.7-alpine
+# =================================
+# DOCKERFILE ACTAS MUNICIPALES v1.0.0
+# Aplicación para personas mayores - Actas del Ayuntamiento
+# Basado en app-base v1.0.3
+# Soporte completo UTF-8 para caracteres españoles
+# =================================
+FROM node:18-alpine
 
-# Configurar UTF-8
-ENV LANG=es_ES.UTF-8
-ENV LC_ALL=es_ES.UTF-8
+LABEL maintainer="xuli70"
+LABEL description="Aplicación de actas municipales para personas mayores"
+LABEL version="1.0.0"
 
-# Crear directorio de trabajo
+# Configurar localización y UTF-8 para caracteres españoles
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+ENV LANGUAGE=C.UTF-8
+
 WORKDIR /app
 
-# Copiar archivos de la aplicación
-COPY index.html /app/
-COPY admin.html /app/
-COPY viewer.html /app/
-COPY app.js /app/
-COPY styles.css /app/
+# Instalar Caddy
+RUN apk add --no-cache caddy
 
-# Crear Caddyfile inline con configuración UTF-8
-RUN echo -e ":8080 {\n\
+# Copiar TODOS los archivos del proyecto
+COPY . .
+
+# Crear Caddyfile ULTRA-SIMPLE para Coolify con UTF-8
+RUN echo -e ":${PORT:-8080} {\n\
     root * /app\n\
     file_server\n\
+    try_files {path} /index.html\n\
     encode gzip\n\
-    header Content-Type text/html\n\
-    header Cache-Control no-cache\n\
-    header X-Content-Type-Options nosniff\n\
-    header X-Frame-Options DENY\n\
-    header X-XSS-Protection \"1; mode=block\"\n\
+    header Content-Type text/html; charset=utf-8\n\
     log {\n\
         output stdout\n\
+        format console\n\
     }\n\
-}" > /etc/caddy/Caddyfile
+}" > /app/Caddyfile
+
+# Puerto 8080 (REQUERIDO por Coolify)
+EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080 || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
 
-# Exponer puerto 8080 (requerido por Coolify)
-EXPOSE 8080
-
-# Comando para iniciar Caddy
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+# Comando de inicio
+CMD ["caddy", "run", "--config", "/app/Caddyfile", "--adapter", "caddyfile"]

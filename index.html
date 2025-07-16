@@ -323,11 +323,19 @@
         ← Volver
     </a>
     
+    <!-- Configuración -->
+    <script src="config.js"></script>
+    
     <!-- JavaScript -->
     <script>
-        // Configuración de Supabase
-        const SUPABASE_URL = 'https://supmcp.axcsol.com';
-        const SUPABASE_ANON_KEY = 'TU_ANON_KEY'; // Necesitarás añadir tu clave aquí
+        // Configuración de Supabase desde config.js
+        const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
+        const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
+        
+        // Verificar configuración
+        if (!SUPABASE_ANON_KEY) {
+            console.error('Error: SUPABASE_ANON_KEY no está configurada');
+        }
         
         // Estado de la aplicación
         let currentView = 'menu';

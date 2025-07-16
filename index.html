@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Actas Municipales - Ayuntamiento</title>
+    
+    <!-- Estilos optimizados para personas mayores -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-size: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        /* Botones grandes y accesibles */
+        .btn {
+            display: inline-block;
+            padding: 20px 40px;
+            margin: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .btn:hover, .btn:focus {
+            background-color: #2980b9;
+            transform: scale(1.02);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background-color: #27ae60;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #229954;
+        }
+        
+        /* Lista de actas */
+        .actas-list {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .acta-item {
+            padding: 20px;
+            border-bottom: 2px solid #eee;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .acta-item:last-child {
+            border-bottom: none;
+        }
+        
+        .acta-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .acta-fecha {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .acta-tipo {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .acta-numero {
+            font-size: 16px;
+            color: #95a5a6;
+        }
+        
+        /* Sección de carga (admin) */
+        .admin-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+        
+        input[type="file"] {
+            font-size: 18px;
+            padding: 10px;
+            border: 2px dashed #3498db;
+            border-radius: 5px;
+            width: 100%;
+            background: #f8f9fa;
+        }
+        
+        /* Vista principal */
+        .main-menu {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .menu-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        /* Mensaje de carga */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 24px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 20px;
+        }
+        
+        .success {
+            background-color: #27ae60;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 20px;
+        }
+        
+        /* Botón flotante de volver */
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 20px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .back-button:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .btn {
+                font-size: 20px;
+                padding: 15px 30px;
+            }
+            
+            .acta-fecha {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Actas Municipales</h1>
+        <p class="subtitle">Plenos del Ayuntamiento</p>
+    </header>
+    
+    <div class="container">
+        <!-- Menú principal -->
+        <div id="mainMenu" class="main-menu">
+            <h2 class="menu-title">¿Qué desea hacer?</h2>
+            <button class="btn" onclick="showActas()">
+                📄 Ver Actas
+            </button>
+            <button class="btn btn-secondary" onclick="showAdmin()">
+                📤 Subir Nueva Acta
+            </button>
+        </div>
+        
+        <!-- Lista de actas -->
+        <div id="actasSection" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">
+                Actas Disponibles
+            </h2>
+            <div id="actasList" class="loading">
+                Cargando actas...
+            </div>
+        </div>
+        
+        <!-- Sección de administración -->
+        <div id="adminSection" class="admin-section">
+            <h2 style="margin-bottom: 30px; color: #2c3e50;">
+                Subir Nueva Acta
+            </h2>
+            
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="numero">Número de Sesión:</label>
+                    <input type="text" id="numero" name="numero" required 
+                           placeholder="Ej: 2024/001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha">Fecha del Pleno:</label>
+                    <input type="date" id="fecha" name="fecha" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo">Tipo de Pleno:</label>
+                    <select id="tipo" name="tipo">
+                        <option value="Ordinario">Ordinario</option>
+                        <option value="Extraordinario">Extraordinario</option>
+                        <option value="Extraordinario Urgente">Extraordinario Urgente</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pdfFile">Archivo PDF:</label>
+                    <input type="file" id="pdfFile" name="pdfFile" 
+                           accept=".pdf" required>
+                </div>
+                
+                <button type="submit" class="btn">
+                    📤 Subir Acta
+                </button>
+            </form>
+            
+            <div id="uploadMessage"></div>
+        </div>
+    </div>
+    
+    <!-- Botón de volver -->
+    <a href="#" class="back-button" id="backButton" onclick="goBack()">
+        ← Volver
+    </a>
+    
+    <!-- JavaScript -->
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://supmcp.axcsol.com';
+        const SUPABASE_ANON_KEY = 'TU_ANON_KEY'; // Necesitarás añadir tu clave aquí
+        
+        // Estado de la aplicación
+        let currentView = 'menu';
+        
+        // Funciones de navegación
+        function showActas() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('actasSection').style.display = 'block';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('backButton').style.display = 'block';
+            currentView = 'actas';
+            loadActas();
+        }
+        
+        function showAdmin() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('actasSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'block';
+            document.getElementById('backButton').style.display = 'block';
+            currentView = 'admin';
+        }
+        
+        function goBack() {
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('actasSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('backButton').style.display = 'none';
+            currentView = 'menu';
+        }
+        
+        // Cargar actas desde Supabase
+        async function loadActas() {
+            const actasList = document.getElementById('actasList');
+            actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Error al cargar actas');
+                
+                const actas = await response.json();
+                
+                if (actas.length === 0) {
+                    actasList.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No hay actas disponibles</p>';
+                    return;
+                }
+                
+                actasList.innerHTML = '<div class="actas-list">' + 
+                    actas.map(acta => `
+                        <div class="acta-item" onclick="openPDF('${acta.pdf_url}')">
+                            <div class="acta-fecha">${formatDate(acta.fecha)}</div>
+                            <div class="acta-tipo">${acta.tipo_pleno}</div>
+                            <div class="acta-numero">Sesión: ${acta.numero_sesion}</div>
+                        </div>
+                    `).join('') + 
+                    '</div>';
+                    
+            } catch (error) {
+                actasList.innerHTML = '<div class="error">Error al cargar las actas. Por favor, intente más tarde.</div>';
+                console.error('Error:', error);
+            }
+        }
+        
+        // Formatear fecha
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('es-ES', options);
+        }
+        
+        // Abrir PDF
+        function openPDF(url) {
+            if (url) {
+                window.open(url, '_blank');
+            } else {
+                alert('El PDF no está disponible');
+            }
+        }
+        
+        // Manejar formulario de carga
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('uploadMessage');
+            messageDiv.innerHTML = '<div class="loading">Subiendo acta...</div>';
+            
+            const formData = new FormData();
+            const pdfFile = document.getElementById('pdfFile').files[0];
+            
+            if (!pdfFile) {
+                messageDiv.innerHTML = '<div class="error">Por favor seleccione un archivo PDF</div>';
+                return;
+            }
+            
+            // Aquí necesitarás implementar la lógica de carga a Supabase Storage
+            // y luego guardar la referencia en la base de datos
+            
+            try {
+                // Simulación de carga exitosa
+                messageDiv.innerHTML = '<div class="success">¡Acta subida correctamente!</div>';
+                
+                // Limpiar formulario
+                document.getElementById('uploadForm').reset();
+                
+                // Volver al menú después de 3 segundos
+                setTimeout(goBack, 3000);
+                
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">Error al subir el acta. Por favor, intente de nuevo.</div>';
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

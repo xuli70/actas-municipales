@@ -1,0 +1,42 @@
+# Archivos de entorno
+.env
+.env.local
+.env.production
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Directorios de dependencias
+node_modules/
+vendor/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos temporales
+*.tmp
+*.temp
+.cache/
+
+# Archivos de respaldo
+*.backup
+*.bak
+
+# Certificados SSL (si los usas localmente)
+*.pem
+*.key
+*.crt
+
+# Archivos de configuración local
+config.local.js
+settings.local.json

@@ -1,0 +1,478 @@
+/* styles.css - Estilos para Aplicación Actas Municipales */
+/* Optimizado para personas mayores con fuentes grandes y contraste alto */
+
+/* ============================================
+   Reset y estilos base
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 18px; /* Base más grande para mejor legibilidad */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   Contenedor principal
+   ============================================ */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* ============================================
+   Cabecera
+   ============================================ */
+header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* ============================================
+   Menú principal
+   ============================================ */
+.main-menu {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.menu-title {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+/* ============================================
+   Botones principales
+   ============================================ */
+.btn {
+    display: inline-block;
+    width: 100%;
+    max-width: 400px;
+    padding: 1.2rem 2rem;
+    margin: 0.8rem auto;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.btn:hover::before {
+    transform: translateX(0);
+}
+
+.btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background-color: #27ae60;
+}
+
+.btn-secondary:hover {
+    background-color: #229954;
+}
+
+/* ============================================
+   Lista de actas
+   ============================================ */
+.actas-list {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin: 1rem 0;
+}
+
+.acta-item {
+    padding: 1.5rem;
+    border-bottom: 1px solid #ecf0f1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.acta-item:last-child {
+    border-bottom: none;
+}
+
+.acta-item:hover {
+    background-color: #f8f9fa;
+    padding-left: 2rem;
+}
+
+.acta-item::after {
+    content: '→';
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    color: #3498db;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.acta-item:hover::after {
+    opacity: 1;
+    right: 1rem;
+}
+
+.acta-fecha {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.3rem;
+}
+
+.acta-tipo {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-bottom: 0.2rem;
+}
+
+.acta-numero {
+    font-size: 0.9rem;
+    color: #95a5a6;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    background-color: #27ae60;
+    color: white;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+}
+
+/* ============================================
+   Formularios
+   ============================================ */
+.admin-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin: 1rem 0;
+}
+
+.form-group {
+    margin-bottom: 1.8rem;
+}
+
+label {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+input[type="file"] {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 2px dashed #3498db;
+    border-radius: 8px;
+    background-color: #ebf5fb;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="file"]:hover {
+    border-color: #2980b9;
+    background-color: #d6eaf8;
+}
+
+/* ============================================
+   Mensajes y estados
+   ============================================ */
+.loading {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.2rem;
+    color: #7f8c8d;
+}
+
+.loading::before {
+    content: '⏳ ';
+    font-size: 2rem;
+    vertical-align: middle;
+}
+
+.error {
+    background-color: #e74c3c;
+    color: white;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 1.1rem;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.success {
+    background-color: #27ae60;
+    color: white;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 1.1rem;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.no-results {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    padding: 3rem;
+}
+
+/* ============================================
+   Botón flotante de volver
+   ============================================ */
+.back-button {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    background-color: #e74c3c;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* ============================================
+   Secciones
+   ============================================ */
+#mainMenu {
+    animation: fadeIn 0.5s ease-out;
+}
+
+#actasSection,
+#adminSection {
+    display: none;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Responsive - Móviles
+   ============================================ */
+@media (max-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+    
+    .container {
+        padding: 0.5rem;
+    }
+    
+    header {
+        padding: 1.5rem 1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .btn {
+        font-size: 1.2rem;
+        padding: 1rem 1.5rem;
+    }
+    
+    .acta-fecha {
+        font-size: 1.2rem;
+    }
+    
+    .back-button {
+        bottom: 1rem;
+        left: 1rem;
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* ============================================
+   Modo oscuro (opcional)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1a1a1a;
+        color: #ecf0f1;
+    }
+    
+    header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
+    }
+    
+    .actas-list,
+    .admin-section {
+        background-color: #2c3e50;
+    }
+    
+    .acta-item {
+        border-bottom-color: #34495e;
+    }
+    
+    .acta-item:hover {
+        background-color: #34495e;
+    }
+    
+    input[type="text"],
+    input[type="date"],
+    select {
+        background-color: #34495e;
+        border-color: #34495e;
+        color: #ecf0f1;
+    }
+}
+
+/* ============================================
+   Accesibilidad
+   ============================================ */
+:focus-visible {
+    outline: 3px solid #3498db;
+    outline-offset: 2px;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

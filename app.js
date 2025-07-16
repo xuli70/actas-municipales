@@ -2,11 +2,15 @@
 // Configuración y lógica principal
 
 // ============================================
-// IMPORTANTE: Debes configurar estas variables
+// Configuración desde config.js (generado por Docker)
 // ============================================
-const SUPABASE_URL = 'https://supmcp.axcsol.com';
-const SUPABASE_ANON_KEY = 'TU_CLAVE_ANONIMA_AQUI'; // Reemplazar con tu clave anónima de Supabase
+const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
+const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
 
+// Verificar configuración
+if (!SUPABASE_ANON_KEY) {
+    console.error('Error: SUPABASE_ANON_KEY no está configurada');
+}
 // Estado global de la aplicación
 let currentView = 'menu';
 let actasCache = [];

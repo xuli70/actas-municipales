@@ -42,13 +42,6 @@
             
             <form id="uploadForm">
                 <div class="form-group">
-                    <label for="denominacion">Denominaci&oacute;n del Acta:</label>
-                    <input type="text" id="denominacion" name="denominacion" required 
-                           placeholder="Ej: Acta del Pleno Ordinario - Enero 2024"
-                           class="input-field">
-                </div>
-                
-                <div class="form-group">
                     <label for="pdfFile">Seleccionar archivo PDF:</label>
                     <input type="file" id="pdfFile" name="pdfFile" 
                            accept=".pdf" required
@@ -173,15 +166,9 @@
             messageDiv.innerHTML = '<div class="loading">Subiendo acta...</div>';
             
             const pdfFile = document.getElementById('pdfFile').files[0];
-            const denominacion = document.getElementById('denominacion').value.trim();
             
             if (!pdfFile) {
                 messageDiv.innerHTML = '<div class="error">Por favor seleccione un archivo PDF</div>';
-                return;
-            }
-            
-            if (!denominacion) {
-                messageDiv.innerHTML = '<div class="error">Por favor ingrese la denominaci&oacute;n del acta</div>';
                 return;
             }
             
@@ -227,7 +214,7 @@
                 
                 // Insertar acta en la base de datos con valores simplificados
                 const actaData = {
-                    titulo: denominacion,
+                    titulo: pdfFile.name,
                     fecha: fechaActual,
                     numero_acta: `AUTO-${timestamp}`,
                     descripcion: null,

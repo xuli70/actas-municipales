@@ -1,5 +1,6 @@
-// Configuración de la aplicación
-// Este archivo se genera automáticamente desde las variables de entorno
+// Archivo de configuraci?n generado din?micamente
+// NO EDITAR - Este archivo se genera autom?ticamente desde las variables de entorno
+
 window.APP_CONFIG = {
     SUPABASE_URL: '${SUPABASE_URL}',
     SUPABASE_ANON_KEY: '${SUPABASE_ANON_KEY}'

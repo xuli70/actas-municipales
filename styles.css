@@ -203,6 +203,13 @@ h1 {
     color: #95a5a6;
 }
 
+.acta-titulo {
+    font-size: 1rem;
+    color: #34495e;
+    margin-top: 0.3rem;
+    font-weight: 500;
+}
+
 .badge {
     display: inline-block;
     padding: 0.2rem 0.6rem;
@@ -238,7 +245,8 @@ label {
 
 input[type="text"],
 input[type="date"],
-select {
+select,
+textarea {
     width: 100%;
     padding: 1rem;
     font-size: 1rem;
@@ -246,11 +254,18 @@ select {
     border-radius: 8px;
     background-color: #f8f9fa;
     transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
 }
 
 input[type="text"]:focus,
 input[type="date"]:focus,
-select:focus {
+select:focus,
+textarea:focus {
     outline: none;
     border-color: #3498db;
     background-color: white;
@@ -271,6 +286,59 @@ input[type="file"] {
 input[type="file"]:hover {
     border-color: #2980b9;
     background-color: #d6eaf8;
+}
+
+/* ============================================
+   Categor?as
+   ============================================ */
+.categorias-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.categoria-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    background-color: #f8f9fa;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.categoria-checkbox:hover {
+    background-color: #ebf5fb;
+    border-color: #3498db;
+}
+
+.categoria-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.8rem;
+    cursor: pointer;
+}
+
+.categoria-checkbox.selected {
+    background-color: #ebf5fb;
+    border-color: #3498db;
+}
+
+.categoria-label {
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    flex: 1;
+}
+
+.categoria-color {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-left: 0.5rem;
 }
 
 /* ============================================

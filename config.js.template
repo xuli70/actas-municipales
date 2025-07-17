@@ -3,18 +3,9 @@
 
 window.APP_CONFIG = {
     SUPABASE_URL: '${SUPABASE_URL}',
-    SUPABASE_ANON_KEY: '${SUPABASE_A// Archivo de configuraci?n generado din?micamente
-// NO EDITAR - Este archivo se genera autom?ticamente desde las variables de entorno
-
-window.APP_CONFIG = {
-    SUPABASE_URL: '${SUPABASE_URL}',
     SUPABASE_ANON_KEY: '${SUPABASE_ANON_KEY}',
     PASSWORD_USER: '${PASSWORD_USER}',
     PASSWORD_ADMIN: '${PASSWORD_ADMIN}',
     OPENAI_API_KEY: '${OPENAI_API_KEY}',
-    AI_MODEL: '${AI_MODEL:-gpt-4o-mini}'
-};
-NON_KEY}',
-    PASSWORD_USER: '${PASSWORD_USER}',
-    PASSWORD_ADMIN: '${PASSWORD_ADMIN}'
+    AI_MODEL: '${AI_MODEL}'
 };

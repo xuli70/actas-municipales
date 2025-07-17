@@ -34,7 +34,7 @@
             </div>
         </div>
         
-        <!-- Secci?n de administraci?n -->
+        <!-- Secci&oacute;n de administraci&oacute;n -->
         <div id="adminSection" class="admin-section">
             <h2 style="margin-bottom: 30px; color: #2c3e50;">
                 Subir Nueva Acta
@@ -42,55 +42,24 @@
             
             <form id="uploadForm">
                 <div class="form-group">
-                    <label for="titulo">T?tulo del Acta:</label>
-                    <input type="text" id="titulo" name="titulo" required 
-                           placeholder="Ej: Acta del Pleno Ordinario - Enero 2024">
+                    <label for="denominacion">Denominaci&oacute;n del Acta:</label>
+                    <input type="text" id="denominacion" name="denominacion" required 
+                           placeholder="Ej: Acta del Pleno Ordinario - Enero 2024"
+                           class="input-field">
                 </div>
                 
                 <div class="form-group">
-                    <label for="numero">N?mero de Acta:</label>
-                    <input type="text" id="numero" name="numero" required 
-                           placeholder="Ej: 2024/001">
-                </div>
-                
-                <div class="form-group">
-                    <label for="fecha">Fecha del Pleno:</label>
-                    <input type="date" id="fecha" name="fecha" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="tipo">Tipo de Sesi?n:</label>
-                    <select id="tipo" name="tipo" required>
-                        <option value="ordinaria">Ordinaria</option>
-                        <option value="extraordinaria">Extraordinaria</option>
-                        <option value="extraordinaria_urgente">Extraordinaria Urgente</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="categorias">Categor?as (seleccione una o m?s):</label>
-                    <div id="categoriasContainer" class="categorias-container">
-                        <!-- Las categor?as se cargar?n din?micamente -->
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="descripcion">Descripci?n (opcional):</label>
-                    <textarea id="descripcion" name="descripcion" rows="3" 
-                             placeholder="Breve descripci?n de los temas principales tratados..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="pdfFile">Archivo PDF:</label>
+                    <label for="pdfFile">Seleccionar archivo PDF:</label>
                     <input type="file" id="pdfFile" name="pdfFile" 
-                           accept=".pdf" required>
-                    <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">
-                        Tama?o m?ximo: 50 MB
+                           accept=".pdf" required
+                           class="file-input">
+                    <small style="color: #666; display: block; margin-top: 0.5rem; font-weight: 500;">
+                        Tama&ntilde;o m&aacute;ximo: 50 MB
                     </small>
                 </div>
                 
-                <button type="submit" class="btn">
-                    ? Subir Acta
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">📤</span> Subir Acta
                 </button>
             </form>
             
@@ -115,57 +84,13 @@
         // Verificar configuraci?n
         if (!SUPABASE_ANON_KEY) {
             console.error('Error: SUPABASE_ANON_KEY no est? configurada');
+            document.body.innerHTML += '<div style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; border-radius: 5px;">?? Error: Falta configuraci?n de Supabase</div>';
+        } else {
+            console.log('Supabase configurado correctamente');
         }
         
-        // Estado de la aplicaci?n
+        // Estado de la aplicaci&oacute;n
         let currentView = 'menu';
-        
-        // Cargar categor?as al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCategorias();
-        });
-        
-        // Cargar categor?as desde Supabase
-        async function loadCategorias() {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/categorias?activa=eq.true&order=orden.asc`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-                
-                if (!response.ok) throw new Error('Error al cargar categor?as');
-                
-                const categorias = await response.json();
-                const container = document.getElementById('categoriasContainer');
-                
-                container.innerHTML = categorias.map(cat => `
-                    <div class="categoria-checkbox" onclick="toggleCategoria(this)">
-                        <input type="checkbox" 
-                               id="cat-${cat.id}" 
-                               name="categorias[]" 
-                               value="${cat.id}">
-                        <label class="categoria-label" for="cat-${cat.id}">
-                            ${cat.nombre}
-                            <span class="categoria-color" style="background-color: ${cat.color}"></span>
-                        </label>
-                    </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Error al cargar categor?as:', error);
-                document.getElementById('categoriasContainer').innerHTML = 
-                    '<p style="color: #e74c3c;">Error al cargar categor?as</p>';
-            }
-        }
-        
-        // Alternar selecci?n de categor?a
-        function toggleCategoria(element) {
-            const checkbox = element.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            element.classList.toggle('selected', checkbox.checked);
-        }
         
         // Funciones de navegaci?n
         function showActas() {
@@ -266,15 +191,21 @@
             messageDiv.innerHTML = '<div class="loading">Subiendo acta...</div>';
             
             const pdfFile = document.getElementById('pdfFile').files[0];
+            const denominacion = document.getElementById('denominacion').value.trim();
             
             if (!pdfFile) {
                 messageDiv.innerHTML = '<div class="error">Por favor seleccione un archivo PDF</div>';
                 return;
             }
             
-            // Validar tama?o del archivo (50MB max)
+            if (!denominacion) {
+                messageDiv.innerHTML = '<div class="error">Por favor ingrese la denominaci&oacute;n del acta</div>';
+                return;
+            }
+            
+            // Validar tama&ntilde;o del archivo (50MB max)
             if (pdfFile.size > 50 * 1024 * 1024) {
-                messageDiv.innerHTML = '<div class="error">El archivo es demasiado grande. M?ximo 50MB</div>';
+                messageDiv.innerHTML = '<div class="error">El archivo es demasiado grande. M&aacute;ximo 50MB</div>';
                 return;
             }
             
@@ -285,15 +216,11 @@
             }
             
             try {
-                // Generar nombre ?nico para el archivo
+                // Generar nombre &uacute;nico para el archivo
                 const timestamp = new Date().getTime();
                 const fileName = `acta_${timestamp}_${pdfFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
                 
                 // Subir archivo a Supabase Storage
-                const formData = new FormData();
-                formData.append('file', pdfFile);
-                
-                // Usar la API REST de Supabase para subir el archivo
                 const uploadResponse = await fetch(`${SUPABASE_URL}/storage/v1/object/actas-pdfs/${fileName}`, {
                     method: 'POST',
                     headers: {
@@ -310,31 +237,22 @@
                     throw new Error('Error al subir el archivo');
                 }
                 
-                // Construir URL p?blica del archivo
+                // Construir URL p&uacute;blica del archivo
                 const archivoUrl = `${SUPABASE_URL}/storage/v1/object/public/actas-pdfs/${fileName}`;
                 
-                // Recopilar datos del formulario
-                const titulo = document.getElementById('titulo').value;
-                const numeroActa = document.getElementById('numero').value;
-                const fecha = document.getElementById('fecha').value;
-                const tipoSesion = document.getElementById('tipo').value;
-                const descripcion = document.getElementById('descripcion').value || null;
+                // Extraer fecha del nombre si es posible
+                const fechaActual = new Date().toISOString().split('T')[0];
                 
-                // Obtener categor?as seleccionadas
-                const categoriasSeleccionadas = Array.from(
-                    document.querySelectorAll('input[name="categorias[]"]:checked')
-                ).map(cb => cb.value);
-                
-                // Insertar acta en la base de datos
+                // Insertar acta en la base de datos con valores simplificados
                 const actaData = {
-                    titulo: titulo,
-                    fecha: fecha,
-                    numero_acta: numeroActa,
-                    descripcion: descripcion,
+                    titulo: denominacion,
+                    fecha: fechaActual,
+                    numero_acta: `AUTO-${timestamp}`,
+                    descripcion: null,
                     archivo_url: archivoUrl,
                     archivo_nombre: pdfFile.name,
                     archivo_tamano: pdfFile.size,
-                    tipo_sesion: tipoSesion,
+                    tipo_sesion: 'ordinaria',
                     estado: 'borrador'
                 };
                 
@@ -355,45 +273,13 @@
                     throw new Error('Error al guardar el acta');
                 }
                 
-                const actaInsertada = await insertResponse.json();
-                const actaId = actaInsertada[0].id;
-                
-                // Insertar relaciones con categor?as
-                if (categoriasSeleccionadas.length > 0) {
-                    const categoriasData = categoriasSeleccionadas.map(catId => ({
-                        acta_id: actaId,
-                        categoria_id: catId
-                    }));
-                    
-                    const catResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas_categorias`, {
-                        method: 'POST',
-                        headers: {
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(categoriasData)
-                    });
-                    
-                    if (!catResponse.ok) {
-                        console.error('Error al asociar categor?as:', await catResponse.text());
-                        // No lanzar error aqu?, el acta ya se guard?
-                    }
-                }
-                
-                // ?xito
-                messageDiv.innerHTML = '<div class="success">?Acta subida correctamente!</div>';
+                // &Eacute;xito
+                messageDiv.innerHTML = '<div class="success">&iexcl;Acta subida correctamente!</div>';
                 
                 // Limpiar formulario
                 document.getElementById('uploadForm').reset();
                 
-                // Desmarcar todas las categor?as
-                document.querySelectorAll('.categoria-checkbox').forEach(el => {
-                    el.classList.remove('selected');
-                    el.querySelector('input[type="checkbox"]').checked = false;
-                });
-                
-                // Volver al men? despu?s de 3 segundos
+                // Volver al men&uacute; despu&eacute;s de 3 segundos
                 setTimeout(goBack, 3000);
                 
             } catch (error) {

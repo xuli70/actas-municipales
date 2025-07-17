@@ -52,6 +52,34 @@
             <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">
                 Actas Disponibles
             </h2>
+            
+            <!-- B&uacute;squeda -->
+            <div class="search-container">
+                <form id="searchForm">
+                    <div class="search-input-group">
+                        <input type="text" 
+                               id="searchInput" 
+                               class="search-input" 
+                               placeholder="Buscar en actas..." 
+                               autocomplete="off">
+                        <button type="submit" class="btn-search">
+                            &#128269; Buscar
+                        </button>
+                    </div>
+                </form>
+                <button id="clearSearchBtn" 
+                        class="btn-clear-search" 
+                        style="display: none;"
+                        onclick="clearSearch()">
+                    &#10006; Limpiar b&uacute;squeda
+                </button>
+            </div>
+            
+            <div id="searchResults" class="search-results" style="display: none;">
+                <h3 class="search-results-title">Resultados de b&uacute;squeda:</h3>
+                <div id="searchResultsList"></div>
+            </div>
+            
             <div id="actasList" class="loading">
                 Cargando actas...
             </div>
@@ -232,6 +260,70 @@
             }
         }
         
+        // Funciones de búsqueda
+        async function searchActas(searchTerm) {
+            const searchResultsDiv = document.getElementById('searchResults');
+            const searchResultsList = document.getElementById('searchResultsList');
+            const actasListDiv = document.getElementById('actasList');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            if (!searchTerm || searchTerm.trim() === '') {
+                clearSearch();
+                return;
+            }
+            
+            searchResultsList.innerHTML = '<div class="loading">Buscando...</div>';
+            searchResultsDiv.style.display = 'block';
+            actasListDiv.style.display = 'none';
+            clearBtn.style.display = 'inline-block';
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/buscar_actas`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        termino: searchTerm
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al buscar');
+                }
+                
+                const results = await response.json();
+                
+                if (results.length === 0) {
+                    searchResultsList.innerHTML = '<p class="no-results">No se encontraron resultados para tu b&uacute;squeda.</p>';
+                    return;
+                }
+                
+                searchResultsList.innerHTML = '<div class="actas-list">' + 
+                    results.map(acta => `
+                        <div class="acta-item" onclick="openPDF('${acta.archivo_url}')">
+                            <div class="acta-filename">${acta.titulo || 'Documento sin nombre'}</div>
+                            <div class="search-relevance">Relevancia: ${(acta.relevancia * 100).toFixed(0)}%</div>
+                        </div>
+                    `).join('') + 
+                    '</div>';
+                    
+            } catch (error) {
+                searchResultsList.innerHTML = '<div class="error">Error al realizar la b&uacute;squeda. Por favor, intente m&aacute;s tarde.</div>';
+                console.error('Error en búsqueda:', error);
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('actasList').style.display = 'block';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+            loadActas();
+        }
+        
         // Manejar formulario de autenticaci&oacute;n
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -355,6 +447,15 @@
             } catch (error) {
                 messageDiv.innerHTML = `<div class="error">Error al subir el acta: ${error.message}</div>`;
                 console.error('Error completo:', error);
+            }
+        });
+        
+        // Manejar formulario de búsqueda
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm) {
+                await searchActas(searchTerm);
             }
         });
     </script>

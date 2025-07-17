@@ -85,6 +85,44 @@
             </div>
         </div>
         
+        <!-- Modal de consulta IA -->
+        <div id="aiQueryModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalActaTitle">Consultar IA sobre el Acta</h3>
+                    <button class="modal-close" onclick="closeAIModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="actaSummary" class="acta-summary-display"></div>
+                    
+                    <div class="ai-query-section">
+                        <label for="aiQuery">Pregunta a la IA sobre este acta:</label>
+                        <textarea id="aiQuery" 
+                                  class="ai-query-input" 
+                                  placeholder="Ejemplo: &iquest;Cu&aacute;les fueron los principales acuerdos? &iquest;Qui&eacute;n vot&oacute; en contra? &iquest;Cu&aacute;nto presupuesto se aprob&oacute;?"
+                                  rows="3"></textarea>
+                        <button id="askAIBtn" class="btn btn-primary" onclick="askAI()">
+                            &#129302; Preguntar a la IA
+                        </button>
+                    </div>
+                    
+                    <div id="aiResponse" class="ai-response" style="display: none;">
+                        <h4>Respuesta de la IA:</h4>
+                        <div id="aiResponseText"></div>
+                    </div>
+                    
+                    <div id="queryHistory" class="query-history" style="display: none;">
+                        <h4>Consultas anteriores:</h4>
+                        <div id="historyList"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="openPDF(currentActaUrl)">&#128196; Ver PDF</button>
+                    <button class="btn btn-secondary" onclick="closeAIModal()">Cerrar</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- Secci&oacute;n de administraci&oacute;n -->
         <div id="adminSection" class="admin-section">
             <h2 style="margin-bottom: 30px; color: #2c3e50;">
@@ -237,8 +275,17 @@
                 
                 actasList.innerHTML = '<div class="actas-list">' + 
                     actas.map(acta => `
-                        <div class="acta-item" onclick="openPDF('${acta.archivo_url}')">
-                            <div class="acta-filename">${acta.archivo_nombre || 'Documento sin nombre'}</div>
+                        <div class="acta-item">
+                            <div class="acta-main" onclick="openPDF('${acta.archivo_url}')">
+                                <div class="acta-filename">${acta.archivo_nombre || 'Documento sin nombre'}</div>
+                                <div class="acta-summary">${acta.resumen_automatico || 'Resumen no disponible aún'}</div>
+                                <div class="acta-status">${getStatusBadge(acta.estado_procesamiento || 'pendiente')}</div>
+                            </div>
+                            <div class="acta-actions">
+                                <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
+                                    &#129302; Consultar IA
+                                </button>
+                            </div>
                         </div>
                     `).join('') + 
                     '</div>';
@@ -301,9 +348,17 @@
                 
                 searchResultsList.innerHTML = '<div class="actas-list">' + 
                     results.map(acta => `
-                        <div class="acta-item" onclick="openPDF('${acta.archivo_url}')">
-                            <div class="acta-filename">${acta.archivo_nombre || acta.titulo || 'Documento sin nombre'}</div>
-                            <div class="search-relevance">Encontrado en: ${acta.titulo}</div>
+                        <div class="acta-item">
+                            <div class="acta-main" onclick="openPDF('${acta.archivo_url}')">
+                                <div class="acta-filename">${acta.archivo_nombre || acta.titulo || 'Documento sin nombre'}</div>
+                                <div class="acta-summary">${acta.resumen_automatico || 'Resumen no disponible'}</div>
+                                <div class="search-relevance">Encontrado en: ${acta.titulo}</div>
+                            </div>
+                            <div class="acta-actions">
+                                <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
+                                    &#129302; Consultar IA
+                                </button>
+                            </div>
                         </div>
                     `).join('') + 
                     '</div>';
@@ -320,6 +375,171 @@
             document.getElementById('actasList').style.display = 'block';
             document.getElementById('clearSearchBtn').style.display = 'none';
             loadActas();
+        }
+        
+        // Variables globales para el modal de IA
+        let currentActaId = null;
+        let currentActaUrl = null;
+        
+        // Función para obtener badge de estado
+        function getStatusBadge(status) {
+            const badges = {
+                'pendiente': '<span class="status-badge pending">⏳ Pendiente</span>',
+                'procesando': '<span class="status-badge processing">🔄 Procesando</span>',
+                'completado': '<span class="status-badge completed">✅ Completado</span>',
+                'error': '<span class="status-badge error">❌ Error</span>'
+            };
+            return badges[status] || badges['pendiente'];
+        }
+        
+        // Funciones del modal de IA
+        function openAIModal(actaId, title, url, summary) {
+            currentActaId = actaId;
+            currentActaUrl = url;
+            
+            document.getElementById('modalActaTitle').textContent = `Consultar IA: ${title}`;
+            document.getElementById('actaSummary').innerHTML = summary ? 
+                `<div class="summary-content"><strong>Resumen:</strong> ${summary}</div>` : 
+                '<div class="summary-content"><em>Resumen no disponible aún</em></div>';
+            
+            document.getElementById('aiQuery').value = '';
+            document.getElementById('aiResponse').style.display = 'none';
+            document.getElementById('aiQueryModal').style.display = 'flex';
+            
+            // Cargar historial de consultas
+            loadQueryHistory(actaId);
+        }
+        
+        function closeAIModal() {
+            document.getElementById('aiQueryModal').style.display = 'none';
+            currentActaId = null;
+            currentActaUrl = null;
+        }
+        
+        // Función para consultar a la IA
+        async function askAI() {
+            const query = document.getElementById('aiQuery').value.trim();
+            const responseDiv = document.getElementById('aiResponse');
+            const responseText = document.getElementById('aiResponseText');
+            const askBtn = document.getElementById('askAIBtn');
+            
+            if (!query) {
+                alert('Por favor ingrese una pregunta');
+                return;
+            }
+            
+            if (!currentActaId) {
+                alert('Error: No hay acta seleccionada');
+                return;
+            }
+            
+            // Deshabilitar botón y mostrar loading
+            askBtn.disabled = true;
+            askBtn.textContent = '🤔 Pensando...';
+            responseDiv.style.display = 'block';
+            responseText.innerHTML = '<div class="loading">La IA está analizando el acta...</div>';
+            
+            try {
+                // Por ahora, simular respuesta de IA (reemplazar con llamada real a OpenAI)
+                const simulatedResponse = await simulateAIResponse(query);
+                
+                responseText.innerHTML = `<div class="ai-answer">${simulatedResponse}</div>`;
+                
+                // Guardar consulta en base de datos
+                await saveQuery(currentActaId, query, simulatedResponse);
+                
+                // Recargar historial
+                loadQueryHistory(currentActaId);
+                
+                // Limpiar campo de pregunta
+                document.getElementById('aiQuery').value = '';
+                
+            } catch (error) {
+                responseText.innerHTML = `<div class="error">Error al consultar la IA: ${error.message}</div>`;
+            } finally {
+                askBtn.disabled = false;
+                askBtn.innerHTML = '🤖 Preguntar a la IA';
+            }
+        }
+        
+        // Simular respuesta de IA (temporal)
+        async function simulateAIResponse(query) {
+            // Simular delay de API
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const responses = {
+                'presupuesto': 'Según el acta, se aprobó un presupuesto de 2.5 millones de euros para obras públicas, con una votación de 8 a favor y 2 en contra.',
+                'acuerdos': 'Los principales acuerdos fueron: 1) Aprobación del presupuesto municipal, 2) Autorización para obras en la calle Mayor, 3) Subvención al club deportivo local.',
+                'asistentes': 'Asistieron 10 concejales de los 12 que componen el pleno. Se excusaron los concejales María García y José Martínez por motivos personales.'
+            };
+            
+            // Búsqueda simple por palabras clave
+            for (const [key, response] of Object.entries(responses)) {
+                if (query.toLowerCase().includes(key)) {
+                    return response;
+                }
+            }
+            
+            return `Basándome en el acta municipal, puedo responder que: Esta consulta requiere análisis específico del contenido. Por favor reformule su pregunta o consulte directamente el PDF para más detalles.`;
+        }
+        
+        // Guardar consulta en base de datos
+        async function saveQuery(actaId, question, answer) {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/consultas_ia`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        acta_id: actaId,
+                        pregunta: question,
+                        respuesta: answer,
+                        created_by: userRole || 'usuario'
+                    })
+                });
+                
+                if (!response.ok) {
+                    console.error('Error al guardar consulta:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error al guardar consulta:', error);
+            }
+        }
+        
+        // Cargar historial de consultas
+        async function loadQueryHistory(actaId) {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/consultas_ia?acta_id=eq.${actaId}&order=created_at.desc&limit=5`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const history = await response.json();
+                    const historyDiv = document.getElementById('queryHistory');
+                    const historyList = document.getElementById('historyList');
+                    
+                    if (history.length > 0) {
+                        historyDiv.style.display = 'block';
+                        historyList.innerHTML = history.map(item => `
+                            <div class="history-item">
+                                <div class="history-question"><strong>P:</strong> ${item.pregunta}</div>
+                                <div class="history-answer"><strong>R:</strong> ${item.respuesta}</div>
+                                <div class="history-date">${new Date(item.created_at).toLocaleString('es-ES')}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        historyDiv.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar historial:', error);
+            }
         }
         
         // Manejar formulario de autenticaci&oacute;n

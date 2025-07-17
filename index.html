@@ -157,6 +157,9 @@
     <!-- Configuraci&oacute;n -->
     <script src="config.js"></script>
     
+    <!-- Integraci&oacute;n OpenAI (opcional) -->
+    <script src="openai_integration.js"></script>
+    
     <!-- JavaScript -->
     <script>
         // Configuraci&oacute;n de Supabase desde config.js
@@ -169,15 +172,18 @@
         
         // Verificar configuraci&oacute;n
         if (!SUPABASE_ANON_KEY) {
-            console.warn('SUPABASE_ANON_KEY no configurada - usando modo desarrollo');
-            // Crear un banner menos intrusivo para desarrollo
-            const devBanner = document.createElement('div');
-            devBanner.innerHTML = '⚠️ Modo desarrollo - Configurar SUPABASE_ANON_KEY';
-            devBanner.style.cssText = 'position: fixed; top: 10px; right: 10px; background: orange; color: white; padding: 8px; border-radius: 4px; font-size: 12px; z-index: 1001;';
-            document.body.appendChild(devBanner);
-            
-            // Ocultar el banner después de 5 segundos
-            setTimeout(() => devBanner.remove(), 5000);
+            console.error('SUPABASE_ANON_KEY no configurada');
+            // Mostrar error crítico en producción
+            document.body.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #f8f9fa;">
+                    <div style="text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px;">
+                        <h2 style="color: #dc3545; margin-bottom: 1rem;">⚠️ Error de Configuración</h2>
+                        <p style="margin-bottom: 1rem;">La aplicación no está configurada correctamente.</p>
+                        <p style="font-size: 0.9rem; color: #666;">Contacte al administrador del sistema.</p>
+                    </div>
+                </div>
+            `;
+            return; // Detener ejecución
         } else {
             console.log('Supabase configurado correctamente');
         }
@@ -471,15 +477,30 @@
             }
         }
         
-        // Simular respuesta de IA (temporal)
+        // Respuesta de IA (simulada o real según configuración)
         async function simulateAIResponse(query) {
+            // Si hay API key configurada, usar IA real (requiere implementación adicional)
+            if (OPENAI_API_KEY && window.AI_FUNCTIONS?.callOpenAI) {
+                try {
+                    // TODO: Extraer texto real del PDF y usar IA real
+                    console.log('Usando IA real con OpenAI');
+                    return await window.AI_FUNCTIONS.callOpenAI(query, 'Contenido del acta a analizar');
+                } catch (error) {
+                    console.error('Error con IA real, usando simulación:', error);
+                    // Continuar con simulación si falla IA real
+                }
+            }
+            
             // Simular delay de API
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             const responses = {
                 'presupuesto': 'Según el acta, se aprobó un presupuesto de 2.5 millones de euros para obras públicas, con una votación de 8 a favor y 2 en contra.',
                 'acuerdos': 'Los principales acuerdos fueron: 1) Aprobación del presupuesto municipal, 2) Autorización para obras en la calle Mayor, 3) Subvención al club deportivo local.',
-                'asistentes': 'Asistieron 10 concejales de los 12 que componen el pleno. Se excusaron los concejales María García y José Martínez por motivos personales.'
+                'asistentes': 'Asistieron 10 concejales de los 12 que componen el pleno. Se excusaron los concejales María García y José Martínez por motivos personales.',
+                'votos': 'La votación final resultó en 8 votos a favor, 2 en contra y 0 abstenciones.',
+                'fecha': 'El pleno se celebró el día indicado en el acta, con inicio a las 19:00 horas.',
+                'alcalde': 'El alcalde presidió la sesión y dirigió los debates correspondientes.'
             };
             
             // Búsqueda simple por palabras clave
@@ -489,7 +510,7 @@
                 }
             }
             
-            return `Basándome en el acta municipal, puedo responder que: Esta consulta requiere análisis específico del contenido. Por favor reformule su pregunta o consulte directamente el PDF para más detalles.`;
+            return `Basándome en el acta municipal: Esta consulta requiere análisis específico del contenido. Para obtener información más detallada, puede reformular su pregunta con términos como: presupuesto, acuerdos, asistentes, votos, fecha, o consultar directamente el PDF.`;
         }
         
         // Guardar consulta en base de datos

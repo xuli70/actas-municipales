@@ -13,14 +13,14 @@
     </header>
     
     <div class="container">
-        <!-- Men? principal -->
+        <!-- Men&uacute; principal -->
         <div id="mainMenu" class="main-menu">
-            <h2 class="menu-title">?Qu? desea hacer?</h2>
+            <h2 class="menu-title">&iquest;Qu&eacute; desea hacer?</h2>
             <button class="btn" onclick="showActas()">
-                ? Ver Actas
+                &#128194; Ver Actas
             </button>
             <button class="btn btn-secondary" onclick="showAdmin()">
-                ? Subir Nueva Acta
+                &#128194; Subir Nueva Acta
             </button>
         </div>
         
@@ -59,7 +59,7 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary">
-                    <span class="btn-icon">📤</span> Subir Acta
+                    <span class="btn-icon">&#128196;</span> Subir Acta
                 </button>
             </form>
             
@@ -67,24 +67,24 @@
         </div>
     </div>
     
-    <!-- Bot?n de volver -->
+    <!-- Bot&oacute;n de volver -->
     <a href="#" class="back-button" id="backButton" onclick="goBack()">
-        ? Volver
+        &#8592; Volver
     </a>
     
-    <!-- Configuraci?n -->
+    <!-- Configuraci&oacute;n -->
     <script src="config.js"></script>
     
     <!-- JavaScript -->
     <script>
-        // Configuraci?n de Supabase desde config.js
+        // Configuraci&oacute;n de Supabase desde config.js
         const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
         const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
         
         // Verificar configuraci?n
         if (!SUPABASE_ANON_KEY) {
-            console.error('Error: SUPABASE_ANON_KEY no est? configurada');
-            document.body.innerHTML += '<div style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; border-radius: 5px;">?? Error: Falta configuraci?n de Supabase</div>';
+            console.error('Error: SUPABASE_ANON_KEY no est&aacute; configurada');
+            document.body.innerHTML += '<div style="position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; border-radius: 5px;">&iexcl;&iexcl; Error: Falta configuraci&oacute;n de Supabase</div>';
         } else {
             console.log('Supabase configurado correctamente');
         }
@@ -92,7 +92,7 @@
         // Estado de la aplicaci&oacute;n
         let currentView = 'menu';
         
-        // Funciones de navegaci?n
+        // Funciones de navegaci&oacute;n
         function showActas() {
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('actasSection').style.display = 'block';
@@ -145,19 +145,19 @@
                         <div class="acta-item" onclick="openPDF('${acta.archivo_url}')">
                             <div class="acta-fecha">${formatDate(acta.fecha)}</div>
                             <div class="acta-tipo">${formatTipoSesion(acta.tipo_sesion)}</div>
-                            <div class="acta-numero">Sesi?n: ${acta.numero_acta}</div>
+                            <div class="acta-numero">Sesi&oacute;n: ${acta.numero_acta}</div>
                             ${acta.titulo ? `<div class="acta-titulo">${acta.titulo}</div>` : ''}
                         </div>
                     `).join('') + 
                     '</div>';
                     
             } catch (error) {
-                actasList.innerHTML = '<div class="error">Error al cargar las actas. Por favor, intente m?s tarde.</div>';
+                actasList.innerHTML = '<div class="error">Error al cargar las actas. Por favor, intente m&aacute;s tarde.</div>';
                 console.error('Error:', error);
             }
         }
         
-        // Formatear tipo de sesi?n para mostrar
+        // Formatear tipo de sesi&oacute;n para mostrar
         function formatTipoSesion(tipo) {
             const tipos = {
                 'ordinaria': 'Ordinaria',
@@ -179,7 +179,7 @@
             if (url) {
                 window.open(url, '_blank');
             } else {
-                alert('El PDF no est? disponible');
+                alert('El PDF no est&aacute; disponible');
             }
         }
         

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Variables</title>
+</head>
+<body>
+    <h1>Debug Variables de Entorno</h1>
+    <div id="debug"></div>
+    
+    <script src="config.js"></script>
+    <script>
+        const debugDiv = document.getElementById('debug');
+        
+        debugDiv.innerHTML = `
+            <h2>Variables desde config.js:</h2>
+            <p><strong>SUPABASE_URL:</strong> ${window.APP_CONFIG?.SUPABASE_URL || 'NO DEFINIDA'}</p>
+            <p><strong>SUPABASE_ANON_KEY:</strong> ${window.APP_CONFIG?.SUPABASE_ANON_KEY ? '***CONFIGURADA***' : 'NO DEFINIDA'}</p>
+            <p><strong>PASSWORD_USER:</strong> ${window.APP_CONFIG?.PASSWORD_USER ? '***CONFIGURADA***' : 'NO DEFINIDA'}</p>
+            <p><strong>PASSWORD_ADMIN:</strong> ${window.APP_CONFIG?.PASSWORD_ADMIN ? '***CONFIGURADA***' : 'NO DEFINIDA'}</p>
+            <p><strong>OPENAI_API_KEY:</strong> ${window.APP_CONFIG?.OPENAI_API_KEY ? '***CONFIGURADA***' : 'NO DEFINIDA'}</p>
+            <p><strong>AI_MODEL:</strong> ${window.APP_CONFIG?.AI_MODEL || 'NO DEFINIDA'}</p>
+            
+            <h2>Object completo:</h2>
+            <pre>${JSON.stringify(window.APP_CONFIG, null, 2)}</pre>
+        `;
+    </script>
+</body>
+</html>

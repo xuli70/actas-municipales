@@ -1,5 +1,65 @@
 /* styles.css - Estilos para Aplicación Actas Municipales */
 /* Optimizado para personas mayores con fuentes grandes y contraste alto */
+/* Versión Profesional - Colores mejorados y mayor contraste */
+
+/* ============================================
+   Variables CSS para consistencia
+   ============================================ */
+:root {
+    /* Colores principales - Alto contraste */
+    --color-primary: #1e3a8a;          /* Azul marino profundo */
+    --color-primary-light: #3b82f6;    /* Azul más claro */
+    --color-primary-dark: #1e293b;     /* Azul muy oscuro */
+    
+    --color-secondary: #059669;        /* Verde esmeralda */
+    --color-secondary-light: #10b981;  /* Verde claro */
+    --color-secondary-dark: #047857;   /* Verde oscuro */
+    
+    --color-accent: #dc2626;           /* Rojo para acciones */
+    --color-accent-light: #ef4444;     /* Rojo claro */
+    --color-accent-dark: #991b1b;      /* Rojo oscuro */
+    
+    /* Colores neutros - Alto contraste */
+    --color-text-primary: #111827;     /* Negro casi puro */
+    --color-text-secondary: #374151;   /* Gris oscuro */
+    --color-text-muted: #6b7280;       /* Gris medio */
+    --color-text-light: #9ca3af;       /* Gris claro */
+    
+    --color-bg-primary: #ffffff;       /* Blanco puro */
+    --color-bg-secondary: #f9fafb;     /* Gris muy claro */
+    --color-bg-accent: #f3f4f6;        /* Gris claro */
+    
+    --color-border: #d1d5db;           /* Borde gris */
+    --color-border-dark: #9ca3af;      /* Borde gris oscuro */
+    
+    /* Sombras profesionales */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+    
+    /* Espaciado consistente */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Tipografía */
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    
+    /* Bordes redondeados */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+}
 
 /* ============================================
    Reset y estilos base
@@ -12,18 +72,20 @@
 
 html {
     font-size: 18px; /* Base más grande para mejor legibilidad */
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-    font-size: 1.1rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+    font-size: var(--font-size-lg);
     line-height: 1.7;
-    color: #2c3e50;
-    background-color: #f8f9fa;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
 }
 
 /* ============================================
@@ -32,31 +94,50 @@ body {
 .container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: var(--spacing-md);
 }
 
 /* ============================================
-   Cabecera
+   Cabecera profesional
    ============================================ */
 header {
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%);
     color: white;
-    padding: 2rem 1rem;
+    padding: var(--spacing-2xl) var(--spacing-md);
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    background-size: 20px 20px;
+    opacity: 0.3;
 }
 
 h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.5px;
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: -0.025em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
 }
 
 .subtitle {
-    font-size: 1rem;
-    opacity: 0.9;
+    font-size: var(--font-size-xl);
+    opacity: 0.95;
     font-weight: 300;
+    position: relative;
+    z-index: 1;
 }
 
 /* ============================================
@@ -64,38 +145,44 @@ h1 {
    ============================================ */
 .main-menu {
     text-align: center;
-    padding: 3rem 1rem;
+    padding: var(--spacing-2xl) var(--spacing-md);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-xl) 0;
+    box-shadow: var(--shadow-md);
 }
 
 .menu-title {
-    font-size: 1.5rem;
-    color: #2c3e50;
-    margin-bottom: 2rem;
-    font-weight: 500;
+    font-size: var(--font-size-2xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xl);
+    font-weight: 600;
+    letter-spacing: -0.025em;
 }
 
 /* ============================================
-   Botones principales
+   Botones principales - Diseño profesional
    ============================================ */
 .btn {
     display: inline-block;
     width: 100%;
     max-width: 400px;
-    padding: 1.2rem 2rem;
-    margin: 0.8rem auto;
-    font-size: 1.3rem;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    margin: var(--spacing-md) auto;
+    font-size: var(--font-size-xl);
     font-weight: 600;
     text-decoration: none;
     text-align: center;
-    background-color: #3498db;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
+    letter-spacing: 0.025em;
 }
 
 .btn::before {
@@ -105,58 +192,69 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
 }
 
 .btn:hover::before {
     transform: translateX(0);
 }
 
-.btn:hover {
-    background-color: #2980b9;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
 .btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn:disabled {
-    background-color: #95a5a6;
+    background: var(--color-text-light);
     cursor: not-allowed;
     transform: none;
-    box-shadow: none;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary {
-    background-color: #27ae60;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%);
 }
 
 .btn-secondary:hover {
-    background-color: #229954;
+    background: linear-gradient(135deg, var(--color-secondary-dark) 0%, var(--color-secondary) 100%);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+
+.btn-icon {
+    margin-right: var(--spacing-sm);
+    font-size: var(--font-size-xl);
 }
 
 /* ============================================
-   Lista de actas
+   Lista de actas - Diseño card profesional
    ============================================ */
 .actas-list {
-    background: white;
-    border-radius: 12px;
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    margin: 1rem 0;
+    box-shadow: var(--shadow-md);
+    margin: var(--spacing-xl) 0;
+    border: 1px solid var(--color-border);
 }
 
 .acta-item {
-    padding: 1.5rem;
-    border-bottom: 1px solid #ecf0f1;
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    background: var(--color-bg-primary);
 }
 
 .acta-item:last-child {
@@ -164,224 +262,185 @@ h1 {
 }
 
 .acta-item:hover {
-    background-color: #f8f9fa;
-    padding-left: 2rem;
+    background: var(--color-bg-accent);
+    padding-left: calc(var(--spacing-xl) + var(--spacing-md));
+    box-shadow: inset 4px 0 0 var(--color-primary);
 }
 
 .acta-item::after {
     content: '→';
     position: absolute;
-    right: 1.5rem;
+    right: var(--spacing-xl);
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.5rem;
-    color: #3498db;
+    font-size: var(--font-size-xl);
+    color: var(--color-primary);
     opacity: 0;
     transition: all 0.3s ease;
+    font-weight: bold;
 }
 
 .acta-item:hover::after {
     opacity: 1;
-    right: 1rem;
+    right: var(--spacing-md);
 }
 
 .acta-fecha {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 0.3rem;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
 }
 
 .acta-tipo {
-    font-size: 1rem;
-    color: #7f8c8d;
-    margin-bottom: 0.2rem;
-}
-
-.acta-numero {
-    font-size: 0.9rem;
-    color: #95a5a6;
-}
-
-.acta-titulo {
-    font-size: 1rem;
-    color: #34495e;
-    margin-top: 0.3rem;
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
     font-weight: 500;
 }
 
-.badge {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    background-color: #27ae60;
-    color: white;
-    font-size: 0.8rem;
-    border-radius: 4px;
-    margin-left: 0.5rem;
+.acta-numero {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.acta-titulo {
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-xs);
+    font-weight: 500;
 }
 
 /* ============================================
-   Formularios
+   Formularios profesionales
    ============================================ */
 .admin-section {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    margin: 1rem 0;
+    background: var(--color-bg-primary);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin: var(--spacing-xl) 0;
+    border: 1px solid var(--color-border);
 }
 
 .form-group {
-    margin-bottom: 1.8rem;
+    margin-bottom: var(--spacing-xl);
 }
 
 label {
     display: block;
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
     font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: 0.025em;
 }
 
-input[type="text"],
-input[type="date"],
-select,
-textarea {
+.input-field {
     width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    border: 2px solid #e1e8ed;
-    border-radius: 8px;
-    background-color: #f8f9fa;
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-primary);
     transition: all 0.3s ease;
     font-family: inherit;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-input[type="text"]:focus,
-input[type="date"]:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: #3498db;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-input[type="file"] {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    border: 2px dashed #3498db;
-    border-radius: 8px;
-    background-color: #ebf5fb;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-input[type="file"]:hover {
-    border-color: #2980b9;
-    background-color: #d6eaf8;
-}
-
-/* ============================================
-   Categor?as
-   ============================================ */
-.categorias-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 0.5rem;
-}
-
-.categoria-checkbox {
-    display: flex;
-    align-items: center;
-    padding: 0.8rem;
-    background-color: #f8f9fa;
-    border: 2px solid #e1e8ed;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.categoria-checkbox:hover {
-    background-color: #ebf5fb;
-    border-color: #3498db;
-}
-
-.categoria-checkbox input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-right: 0.8rem;
-    cursor: pointer;
-}
-
-.categoria-checkbox.selected {
-    background-color: #ebf5fb;
-    border-color: #3498db;
-}
-
-.categoria-label {
-    font-size: 1rem;
+    color: var(--color-text-primary);
     font-weight: 500;
-    cursor: pointer;
-    flex: 1;
 }
 
-.categoria-color {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-left: 0.5rem;
+.input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: var(--color-bg-primary);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+    transform: translateY(-1px);
+}
+
+.file-input {
+    width: 100%;
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    border: 3px dashed var(--color-primary);
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.file-input:hover {
+    border-color: var(--color-primary-dark);
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.file-input:focus {
+    outline: none;
+    border-color: var(--color-primary-dark);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.2);
 }
 
 /* ============================================
-   Mensajes y estados
+   Mensajes y estados profesionales
    ============================================ */
 .loading {
     text-align: center;
-    padding: 3rem;
-    font-size: 1.2rem;
-    color: #7f8c8d;
+    padding: var(--spacing-2xl);
+    font-size: var(--font-size-xl);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-border);
 }
 
 .loading::before {
-    content: '⏳ ';
-    font-size: 2rem;
-    vertical-align: middle;
+    content: '⏳';
+    font-size: var(--font-size-2xl);
+    margin-right: var(--spacing-sm);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
 }
 
 .error {
-    background-color: #e74c3c;
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
     color: white;
-    padding: 1.2rem;
-    border-radius: 8px;
-    margin: 1rem 0;
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
     text-align: center;
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-accent-dark);
     animation: shake 0.5s ease-in-out;
 }
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
 }
 
 .success {
-    background-color: #27ae60;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%);
     color: white;
-    padding: 1.2rem;
-    border-radius: 8px;
-    margin: 1rem 0;
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
     text-align: center;
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-secondary-dark);
     animation: slideIn 0.5s ease-out;
 }
 
@@ -398,54 +457,64 @@ input[type="file"]:hover {
 
 .no-results {
     text-align: center;
-    color: #7f8c8d;
-    font-size: 1.1rem;
-    padding: 3rem;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-2xl);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--color-border);
+    font-weight: 500;
 }
 
 /* ============================================
-   Botón flotante de volver
+   Botón flotante de volver - Profesional
    ============================================ */
 .back-button {
     position: fixed;
-    bottom: 2rem;
-    left: 2rem;
-    background-color: #e74c3c;
+    bottom: var(--spacing-xl);
+    left: var(--spacing-xl);
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
     color: white;
-    padding: 1rem 2rem;
+    padding: var(--spacing-lg) var(--spacing-xl);
     border-radius: 50px;
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
     font-weight: 600;
     text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
     display: none;
     z-index: 1000;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--color-accent-dark);
+    letter-spacing: 0.025em;
 }
 
 .back-button:hover {
-    background-color: #c0392b;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(135deg, var(--color-accent-dark) 0%, var(--color-accent) 100%);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-xl);
+}
+
+.back-button:active {
+    transform: translateY(-1px) scale(1.02);
 }
 
 /* ============================================
-   Secciones
+   Animaciones de secciones
    ============================================ */
 #mainMenu {
-    animation: fadeIn 0.5s ease-out;
+    animation: fadeIn 0.6s ease-out;
 }
 
 #actasSection,
 #adminSection {
     display: none;
-    animation: fadeIn 0.5s ease-out;
+    animation: fadeIn 0.6s ease-out;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
@@ -454,7 +523,7 @@ input[type="file"]:hover {
 }
 
 /* ============================================
-   Responsive - Móviles
+   Responsive - Diseño adaptativo
    ============================================ */
 @media (max-width: 768px) {
     html {
@@ -462,75 +531,105 @@ input[type="file"]:hover {
     }
     
     .container {
-        padding: 0.5rem;
+        padding: var(--spacing-sm);
     }
     
     header {
-        padding: 1.5rem 1rem;
+        padding: var(--spacing-xl) var(--spacing-md);
     }
     
     h1 {
-        font-size: 1.8rem;
+        font-size: var(--font-size-2xl);
     }
     
     .btn {
-        font-size: 1.2rem;
-        padding: 1rem 1.5rem;
+        font-size: var(--font-size-lg);
+        padding: var(--spacing-md) var(--spacing-lg);
+        margin: var(--spacing-sm) auto;
     }
     
     .acta-fecha {
-        font-size: 1.2rem;
+        font-size: var(--font-size-lg);
     }
     
     .back-button {
-        bottom: 1rem;
-        left: 1rem;
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
+        bottom: var(--spacing-md);
+        left: var(--spacing-md);
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: var(--font-size-base);
+    }
+    
+    .admin-section {
+        padding: var(--spacing-xl);
+        margin: var(--spacing-md) 0;
+    }
+    
+    .form-group {
+        margin-bottom: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 15px;
+    }
+    
+    .container {
+        padding: var(--spacing-xs);
+    }
+    
+    .main-menu,
+    .admin-section {
+        margin: var(--spacing-sm) 0;
+        padding: var(--spacing-lg);
+    }
+    
+    .btn {
+        max-width: 100%;
+        font-size: var(--font-size-base);
     }
 }
 
 /* ============================================
-   Modo oscuro (opcional)
+   Modo oscuro mejorado (opcional)
    ============================================ */
 @media (prefers-color-scheme: dark) {
-    body {
-        background-color: #1a1a1a;
-        color: #ecf0f1;
-    }
-    
-    header {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
-    }
-    
-    .actas-list,
-    .admin-section {
-        background-color: #2c3e50;
-    }
-    
-    .acta-item {
-        border-bottom-color: #34495e;
+    :root {
+        --color-text-primary: #f9fafb;
+        --color-text-secondary: #e5e7eb;
+        --color-text-muted: #9ca3af;
+        
+        --color-bg-primary: #1f2937;
+        --color-bg-secondary: #111827;
+        --color-bg-accent: #374151;
+        
+        --color-border: #4b5563;
+        --color-border-dark: #6b7280;
     }
     
     .acta-item:hover {
-        background-color: #34495e;
+        background: var(--color-bg-accent);
     }
     
-    input[type="text"],
-    input[type="date"],
-    select {
-        background-color: #34495e;
-        border-color: #34495e;
-        color: #ecf0f1;
+    .input-field,
+    .file-input {
+        background-color: var(--color-bg-accent);
+        color: var(--color-text-primary);
+    }
+    
+    .loading,
+    .no-results {
+        background: var(--color-bg-accent);
     }
 }
 
 /* ============================================
-   Accesibilidad
+   Accesibilidad mejorada
    ============================================ */
 :focus-visible {
-    outline: 3px solid #3498db;
+    outline: 3px solid var(--color-primary);
     outline-offset: 2px;
+    border-radius: var(--radius-sm);
 }
 
 .visually-hidden {
@@ -543,4 +642,37 @@ input[type="file"]:hover {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/* Mejoras para usuarios con preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Mejora del contraste para usuarios con baja visión */
+@media (prefers-contrast: high) {
+    :root {
+        --color-primary: #000080;
+        --color-secondary: #006400;
+        --color-accent: #8b0000;
+        --color-text-primary: #000000;
+        --color-bg-primary: #ffffff;
+        --color-border: #000000;
+    }
+    
+    .btn,
+    .input-field,
+    .file-input {
+        border-width: 3px;
+    }
+    
+    .acta-item:hover {
+        box-shadow: inset 6px 0 0 var(--color-primary);
+    }
 }

@@ -143,10 +143,7 @@
                 actasList.innerHTML = '<div class="actas-list">' + 
                     actas.map(acta => `
                         <div class="acta-item" onclick="openPDF('${acta.archivo_url}')">
-                            <div class="acta-fecha">${formatDate(acta.fecha)}</div>
-                            <div class="acta-tipo">${formatTipoSesion(acta.tipo_sesion)}</div>
-                            <div class="acta-numero">Sesi&oacute;n: ${acta.numero_acta}</div>
-                            ${acta.titulo ? `<div class="acta-titulo">${acta.titulo}</div>` : ''}
+                            <div class="acta-filename">${acta.archivo_nombre || 'Documento sin nombre'}</div>
                         </div>
                     `).join('') + 
                     '</div>';
@@ -157,22 +154,7 @@
             }
         }
         
-        // Formatear tipo de sesi&oacute;n para mostrar
-        function formatTipoSesion(tipo) {
-            const tipos = {
-                'ordinaria': 'Ordinaria',
-                'extraordinaria': 'Extraordinaria',
-                'extraordinaria_urgente': 'Extraordinaria Urgente'
-            };
-            return tipos[tipo] || tipo;
-        }
-        
-        // Formatear fecha
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString('es-ES', options);
-        }
+        // Funciones de formateo eliminadas - ya no se necesitan
         
         // Abrir PDF
         function openPDF(url) {

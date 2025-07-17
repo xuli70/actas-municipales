@@ -1,8 +1,14 @@
-// Archivo de configuraci?n de ejemplo
-// Copiar a config.js y reemplazar con valores reales
-// Este archivo ser? generado autom?ticamente en el servidor con las variables de entorno
+// Archivo de configuración para desarrollo local
+// INSTRUCCIONES:
+// 1. Copia este archivo como 'config.js'
+// 2. Rellena las variables con tus valores reales
+// 3. NUNCA subas config.js al repositorio (está en .gitignore)
 
 window.APP_CONFIG = {
-    SUPABASE_URL: 'https://tuproyecto.supabase.co',
-    SUPABASE_ANON_KEY: 'tu_anon_key_aqui'
+    SUPABASE_URL: 'https://supmcp.axcsol.com',
+    SUPABASE_ANON_KEY: 'TU_CLAVE_ANONIMA_AQUI', // Reemplazar con clave real
+    PASSWORD_USER: 'usuario123',                  // Reemplazar con contraseña real
+    PASSWORD_ADMIN: 'admin123',                   // Reemplazar con contraseña real
+    OPENAI_API_KEY: '',                          // Opcional - para funciones IA
+    AI_MODEL: 'gpt-4o-mini'                      // Opcional - modelo IA por defecto
 };

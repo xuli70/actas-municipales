@@ -1,27 +1,38 @@
 # =================================
-# DOCKERFILE ACTAS MUNICIPALES v1.0.0
-# Aplicación para personas mayores - Actas del Ayuntamiento
-# Basado en app-base v1.0.3
-# Soporte completo UTF-8 para caracteres españoles
+# DOCKERFILE ACTAS MUNICIPALES v2.0.0
+# Aplicaci?n para personas mayores - Actas del Ayuntamiento
+# Soporte completo UTF-8 para caracteres espa?oles
+# Variables de entorno din?micas
 # =================================
 FROM node:18-alpine
 
 LABEL maintainer="xuli70"
-LABEL description="Aplicación de actas municipales para personas mayores"
-LABEL version="1.0.0"
+LABEL description="Aplicaci?n de actas municipales para personas mayores"
+LABEL version="2.0.0"
 
-# Configurar localización y UTF-8 para caracteres españoles
+# Configurar localizaci?n y UTF-8 para caracteres espa?oles
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV LANGUAGE=C.UTF-8
 
+# Variables de entorno por defecto (se sobrescriben en Coolify)
+ENV SUPABASE_URL=https://supmcp.axcsol.com
+ENV SUPABASE_ANON_KEY=""
+
 WORKDIR /app
 
-# Instalar Caddy
-RUN apk add --no-cache caddy
+# Instalar Caddy, wget para healthcheck y envsubst para variables
+RUN apk add --no-cache caddy wget gettext
 
 # Copiar TODOS los archivos del proyecto
 COPY . .
+
+# Script para generar config.js desde variables de entorno
+RUN echo '#!/bin/sh' > /app/generate-config.sh && \
+    echo 'echo "Generando config.js con variables de entorno..."' >> /app/generate-config.sh && \
+    echo 'envsubst < /app/config.js.template > /app/config.js' >> /app/generate-config.sh && \
+    echo 'echo "config.js generado exitosamente"' >> /app/generate-config.sh && \
+    chmod +x /app/generate-config.sh
 
 # Crear Caddyfile ULTRA-SIMPLE para Coolify con UTF-8
 RUN echo -e ":${PORT:-8080} {\n\
@@ -43,5 +54,13 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
 
+# Script de inicio que genera config.js y luego inicia Caddy
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'echo "Iniciando aplicaci?n Actas Municipales..."' >> /app/start.sh && \
+    echo '/app/generate-config.sh' >> /app/start.sh && \
+    echo 'echo "Iniciando servidor Caddy..."' >> /app/start.sh && \
+    echo 'exec caddy run --config /app/Caddyfile --adapter caddyfile' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
 # Comando de inicio
-CMD ["caddy", "run", "--config", "/app/Caddyfile", "--adapter", "caddyfile"]
+CMD ["/app/start.sh"]

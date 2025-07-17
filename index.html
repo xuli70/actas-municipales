@@ -183,10 +183,18 @@
                     </div>
                 </div>
             `;
-            return; // Detener ejecución
+            throw new Error('Configuración incompleta'); // Detener ejecución
         } else {
             console.log('Supabase configurado correctamente');
         }
+        
+        // Debug: Mostrar variables cargadas (solo en desarrollo)
+        console.log('=== DEBUG VARIABLES ===');
+        console.log('SUPABASE_URL:', SUPABASE_URL);
+        console.log('SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA');
+        console.log('PASSWORD_USER:', PASSWORD_USER ? '***configurada***' : 'NO CONFIGURADA');
+        console.log('PASSWORD_ADMIN:', PASSWORD_ADMIN ? '***configurada***' : 'NO CONFIGURADA');
+        console.log('========================');
         
         // Estado de la aplicaci&oacute;n
         let currentView = 'auth';

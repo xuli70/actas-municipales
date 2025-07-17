@@ -13,13 +13,36 @@
     </header>
     
     <div class="container">
+        <!-- Pantalla de autenticaci&oacute;n -->
+        <div id="authScreen" class="auth-screen">
+            <h2 class="auth-title">Acceso al Sistema</h2>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="password">Contrase&ntilde;a de acceso:</label>
+                    <input type="password" id="password" name="password" 
+                           required class="password-input" 
+                           placeholder="Ingrese su contrase&ntilde;a">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    &#128273; Ingresar
+                </button>
+            </form>
+            <div id="authMessage"></div>
+        </div>
+        
         <!-- Men&uacute; principal -->
-        <div id="mainMenu" class="main-menu">
+        <div id="mainMenu" class="main-menu" style="display: none;">
+            <div class="user-info">
+                <span id="userRole"></span>
+                <button class="btn-logout" onclick="logout()">
+                    &#128274; Cerrar Sesi&oacute;n
+                </button>
+            </div>
             <h2 class="menu-title">&iquest;Qu&eacute; desea hacer?</h2>
             <button class="btn" onclick="showActas()">
                 &#128194; Ver Actas
             </button>
-            <button class="btn btn-secondary" onclick="showAdmin()">
+            <button class="btn btn-secondary" id="adminButton" onclick="showAdmin()" style="display: none;">
                 &#128194; Subir Nueva Acta
             </button>
         </div>
@@ -73,6 +96,8 @@
         // Configuraci&oacute;n de Supabase desde config.js
         const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
         const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
+        const PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || 'usuario123';
+        const PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || 'admin123';
         
         // Verificar configuraci?n
         if (!SUPABASE_ANON_KEY) {
@@ -83,7 +108,56 @@
         }
         
         // Estado de la aplicaci&oacute;n
-        let currentView = 'menu';
+        let currentView = 'auth';
+        let userRole = null; // 'user' o 'admin'
+        
+        // Funciones de autenticaci&oacute;n
+        function authenticate(password) {
+            if (password === PASSWORD_ADMIN) {
+                userRole = 'admin';
+                return 'admin';
+            } else if (password === PASSWORD_USER) {
+                userRole = 'user';
+                return 'user';
+            }
+            return null;
+        }
+        
+        function showMainMenu() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('actasSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('backButton').style.display = 'none';
+            
+            // Mostrar informaci&oacute;n del usuario
+            const userRoleElement = document.getElementById('userRole');
+            const adminButton = document.getElementById('adminButton');
+            
+            if (userRole === 'admin') {
+                userRoleElement.textContent = 'Administrador';
+                adminButton.style.display = 'block';
+            } else {
+                userRoleElement.textContent = 'Usuario';
+                adminButton.style.display = 'none';
+            }
+            
+            currentView = 'menu';
+        }
+        
+        function logout() {
+            userRole = null;
+            currentView = 'auth';
+            document.getElementById('authScreen').style.display = 'block';
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('actasSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('backButton').style.display = 'none';
+            
+            // Limpiar formulario
+            document.getElementById('authForm').reset();
+            document.getElementById('authMessage').innerHTML = '';
+        }
         
         // Funciones de navegaci&oacute;n
         function showActas() {
@@ -96,6 +170,10 @@
         }
         
         function showAdmin() {
+            if (userRole !== 'admin') {
+                alert('Acceso denegado. Solo los administradores pueden subir actas.');
+                return;
+            }
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('actasSection').style.display = 'none';
             document.getElementById('adminSection').style.display = 'block';
@@ -104,11 +182,7 @@
         }
         
         function goBack() {
-            document.getElementById('mainMenu').style.display = 'block';
-            document.getElementById('actasSection').style.display = 'none';
-            document.getElementById('adminSection').style.display = 'none';
-            document.getElementById('backButton').style.display = 'none';
-            currentView = 'menu';
+            showMainMenu();
         }
         
         // Cargar actas desde Supabase
@@ -157,6 +231,33 @@
                 alert('El PDF no est&aacute; disponible');
             }
         }
+        
+        // Manejar formulario de autenticaci&oacute;n
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('authMessage');
+            const passwordInput = document.getElementById('password');
+            const password = passwordInput.value;
+            
+            if (!password) {
+                messageDiv.innerHTML = '<div class="error">Por favor ingrese una contrase&ntilde;a</div>';
+                return;
+            }
+            
+            const role = authenticate(password);
+            
+            if (role) {
+                messageDiv.innerHTML = '<div class="success">Acceso autorizado...</div>';
+                setTimeout(() => {
+                    showMainMenu();
+                }, 1000);
+            } else {
+                messageDiv.innerHTML = '<div class="error">Contrase&ntilde;a incorrecta</div>';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        });
         
         // Manejar formulario de carga
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {

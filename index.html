@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Actas Municipales - Ayuntamiento</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- PDF.js para extracción de texto -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="pdf_text_extractor.js"></script>
+    <script src="pdf_batch_processor.js"></script>
 </head>
 <body>
     <header>
@@ -146,6 +150,21 @@
             </form>
             
             <div id="uploadMessage"></div>
+            
+            <!-- Sección de procesamiento de PDFs -->
+            <div class="pdf-processor-section" style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e0e0e0;">
+                <h3 style="color: #2c3e50; margin-bottom: 20px;">⚡ Procesamiento de Texto en PDFs</h3>
+                
+                <div id="processingStats" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <p>Cargando estadísticas...</p>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="processPendingPDFs()" id="processBtn">
+                    🤖 Procesar PDFs Pendientes
+                </button>
+                
+                <div id="processingMessage" style="margin-top: 20px;"></div>
+            </div>
         </div>
     </div>
     
@@ -268,6 +287,9 @@
             document.getElementById('adminSection').style.display = 'block';
             document.getElementById('backButton').style.display = 'block';
             currentView = 'admin';
+            
+            // Cargar estadísticas de procesamiento
+            loadProcessingStats();
         }
         
         function goBack() {
@@ -463,8 +485,53 @@
             responseText.innerHTML = '<div class="loading">La IA está analizando el acta...</div>';
             
             try {
-                // Por ahora, simular respuesta de IA (reemplazar con llamada real a OpenAI)
-                const simulatedResponse = await simulateAIResponse(query);
+                // Obtener el texto extraído del acta
+                let textoActa = '';
+                try {
+                    const actaResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${currentActaId}&select=texto_extraido,titulo,archivo_url`, {
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    });
+                    
+                    if (actaResponse.ok) {
+                        const actaData = await actaResponse.json();
+                        if (actaData.length > 0) {
+                            textoActa = actaData[0].texto_extraido || '';
+                            
+                            // Si no hay texto extraído, intentar extraerlo del PDF
+                            if (!textoActa && actaData[0].archivo_url && window.PDFTextExtractor && window.PDFTextExtractor.isPdfJsLoaded()) {
+                                try {
+                                    responseText.innerHTML = '<div class="loading">Extrayendo texto del PDF...</div>';
+                                    window.PDFTextExtractor.configurePdfJs();
+                                    textoActa = await window.PDFTextExtractor.extractTextFromUrl(actaData[0].archivo_url);
+                                    
+                                    // Actualizar el texto en la base de datos para futuras consultas
+                                    await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${currentActaId}`, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'apikey': SUPABASE_ANON_KEY,
+                                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            texto_extraido: textoActa,
+                                            estado_procesamiento: 'completado'
+                                        })
+                                    });
+                                } catch (extractError) {
+                                    console.error('Error extrayendo texto del PDF:', extractError);
+                                }
+                            }
+                        }
+                    }
+                } catch (fetchError) {
+                    console.error('Error obteniendo datos del acta:', fetchError);
+                }
+                
+                // Generar respuesta de IA
+                const simulatedResponse = await simulateAIResponse(query, textoActa);
                 
                 responseText.innerHTML = `<div class="ai-answer">${simulatedResponse}</div>`;
                 
@@ -486,13 +553,14 @@
         }
         
         // Respuesta de IA (simulada o real según configuración)
-        async function simulateAIResponse(query) {
-            // Si hay API key configurada, usar IA real (requiere implementación adicional)
+        async function simulateAIResponse(query, textoActa) {
+            // Si hay API key configurada, usar IA real
             if (OPENAI_API_KEY && window.AI_FUNCTIONS?.callOpenAI) {
                 try {
-                    // TODO: Extraer texto real del PDF y usar IA real
                     console.log('Usando IA real con OpenAI');
-                    return await window.AI_FUNCTIONS.callOpenAI(query, 'Contenido del acta a analizar');
+                    // Si hay texto extraído, usarlo; si no, indicar que no hay contenido
+                    const contexto = textoActa || 'No se pudo extraer el contenido del PDF. Por favor, revise el archivo directamente.';
+                    return await window.AI_FUNCTIONS.callOpenAI(query, contexto);
                 } catch (error) {
                     console.error('Error con IA real, usando simulación:', error);
                     // Continuar con simulación si falla IA real
@@ -502,23 +570,64 @@
             // Simular delay de API
             await new Promise(resolve => setTimeout(resolve, 2000));
             
+            // Si hay texto extraído, intentar responder basado en él
+            if (textoActa) {
+                const queryLower = query.toLowerCase();
+                const textoLower = textoActa.toLowerCase();
+                
+                // Buscar información relevante en el texto
+                let respuesta = 'Basándome en el contenido del acta:\n\n';
+                
+                // Buscar fragmentos relevantes (máximo 3 líneas alrededor de la palabra clave)
+                const palabrasClave = query.split(' ').filter(p => p.length > 3);
+                let fragmentosRelevantes = [];
+                
+                for (const palabra of palabrasClave) {
+                    const indice = textoLower.indexOf(palabra.toLowerCase());
+                    if (indice !== -1) {
+                        // Extraer contexto alrededor de la palabra encontrada
+                        const inicio = Math.max(0, indice - 200);
+                        const fin = Math.min(textoActa.length, indice + 200);
+                        let fragmento = textoActa.substring(inicio, fin).trim();
+                        
+                        // Añadir puntos suspensivos si no es el inicio/fin
+                        if (inicio > 0) fragmento = '...' + fragmento;
+                        if (fin < textoActa.length) fragmento = fragmento + '...';
+                        
+                        fragmentosRelevantes.push(fragmento);
+                    }
+                }
+                
+                if (fragmentosRelevantes.length > 0) {
+                    respuesta += 'He encontrado la siguiente información relevante:\n\n';
+                    respuesta += fragmentosRelevantes.slice(0, 3).join('\n\n');
+                } else {
+                    respuesta += 'No he encontrado información específica sobre "' + query + '" en el acta. ';
+                    respuesta += 'El documento contiene ' + textoActa.length + ' caracteres de contenido. ';
+                    respuesta += 'Por favor, reformule su pregunta o consulte el PDF directamente.';
+                }
+                
+                return respuesta;
+            }
+            
+            // Si no hay texto extraído, usar respuestas genéricas
             const responses = {
-                'presupuesto': 'Según el acta, se aprobó un presupuesto de 2.5 millones de euros para obras públicas, con una votación de 8 a favor y 2 en contra.',
-                'acuerdos': 'Los principales acuerdos fueron: 1) Aprobación del presupuesto municipal, 2) Autorización para obras en la calle Mayor, 3) Subvención al club deportivo local.',
-                'asistentes': 'Asistieron 10 concejales de los 12 que componen el pleno. Se excusaron los concejales María García y José Martínez por motivos personales.',
-                'votos': 'La votación final resultó en 8 votos a favor, 2 en contra y 0 abstenciones.',
-                'fecha': 'El pleno se celebró el día indicado en el acta, con inicio a las 19:00 horas.',
-                'alcalde': 'El alcalde presidió la sesión y dirigió los debates correspondientes.'
+                'presupuesto': 'No se pudo extraer el contenido del PDF para analizar información sobre presupuestos.',
+                'acuerdos': 'No se pudo extraer el contenido del PDF para identificar los acuerdos tomados.',
+                'asistentes': 'No se pudo extraer el contenido del PDF para verificar los asistentes.',
+                'votos': 'No se pudo extraer el contenido del PDF para analizar las votaciones.',
+                'fecha': 'No se pudo extraer el contenido del PDF para verificar fechas específicas.',
+                'alcalde': 'No se pudo extraer el contenido del PDF para obtener información sobre el alcalde.'
             };
             
             // Búsqueda simple por palabras clave
             for (const [key, response] of Object.entries(responses)) {
                 if (query.toLowerCase().includes(key)) {
-                    return response;
+                    return response + ' Por favor, consulte el PDF directamente o intente más tarde.';
                 }
             }
             
-            return `Basándome en el acta municipal: Esta consulta requiere análisis específico del contenido. Para obtener información más detallada, puede reformular su pregunta con términos como: presupuesto, acuerdos, asistentes, votos, fecha, o consultar directamente el PDF.`;
+            return 'No se pudo extraer el contenido del PDF para responder su consulta. Por favor, consulte el documento directamente haciendo clic en "Ver PDF".';
         }
         
         // Guardar consulta en base de datos
@@ -661,6 +770,29 @@
                 // Extraer fecha del nombre si es posible
                 const fechaActual = new Date().toISOString().split('T')[0];
                 
+                // Configurar PDF.js si no está configurado
+                if (window.PDFTextExtractor && window.PDFTextExtractor.isPdfJsLoaded()) {
+                    window.PDFTextExtractor.configurePdfJs();
+                }
+                
+                // Extraer texto del PDF
+                let textoExtraido = '';
+                let resumenAutomatico = '';
+                
+                try {
+                    if (window.PDFTextExtractor && window.PDFTextExtractor.isPdfJsLoaded()) {
+                        messageDiv.innerHTML = '<div class="loading">Extrayendo texto del PDF...</div>';
+                        textoExtraido = await window.PDFTextExtractor.extractTextFromFile(pdfFile);
+                        resumenAutomatico = window.PDFTextExtractor.generateSummary(textoExtraido, 500);
+                        console.log('Texto extraído exitosamente:', textoExtraido.length, 'caracteres');
+                    } else {
+                        console.warn('PDF.js no está disponible, subiendo sin extracción de texto');
+                    }
+                } catch (extractError) {
+                    console.error('Error al extraer texto del PDF:', extractError);
+                    // Continuar sin texto extraído
+                }
+                
                 // Insertar acta en la base de datos con valores simplificados
                 const actaData = {
                     titulo: pdfFile.name,
@@ -671,7 +803,10 @@
                     archivo_nombre: pdfFile.name,
                     archivo_tamano: pdfFile.size,
                     tipo_sesion: 'ordinaria',
-                    estado: 'borrador'
+                    estado: 'borrador',
+                    texto_extraido: textoExtraido || null,
+                    resumen_automatico: resumenAutomatico || null,
+                    estado_procesamiento: textoExtraido ? 'completado' : 'pendiente'
                 };
                 
                 const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {
@@ -714,6 +849,105 @@
                 await searchActas(searchTerm);
             }
         });
+        
+        // Función para cargar estadísticas de procesamiento
+        async function loadProcessingStats() {
+            const statsDiv = document.getElementById('processingStats');
+            
+            try {
+                // Obtener estadísticas directamente de la tabla
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?select=estado_procesamiento`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const actas = await response.json();
+                    
+                    // Calcular estadísticas
+                    const stats = {
+                        completados: actas.filter(a => a.estado_procesamiento === 'completado').length,
+                        pendientes: actas.filter(a => a.estado_procesamiento === 'pendiente').length,
+                        procesando: actas.filter(a => a.estado_procesamiento === 'procesando').length,
+                        con_error: actas.filter(a => a.estado_procesamiento === 'error').length,
+                        total: actas.length
+                    };
+                    
+                    stats.porcentaje_completado = stats.total > 0 ? 
+                        Math.round((stats.completados / stats.total) * 100) : 0;
+                    
+                    statsDiv.innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <div><strong>Total de actas:</strong> ${stats.total}</div>
+                            <div><strong>Completados:</strong> <span style="color: #27ae60;">${stats.completados}</span></div>
+                            <div><strong>Pendientes:</strong> <span style="color: #e67e22;">${stats.pendientes}</span></div>
+                            <div><strong>Con error:</strong> <span style="color: #e74c3c;">${stats.con_error}</span></div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
+                                <div style="background: #27ae60; height: 100%; width: ${stats.porcentaje_completado}%; transition: width 0.3s;"></div>
+                            </div>
+                            <div style="text-align: center; margin-top: 5px; font-weight: bold;">
+                                ${stats.porcentaje_completado}% Completado
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    statsDiv.innerHTML = '<p style="color: #e74c3c;">Error al cargar estadísticas</p>';
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+                statsDiv.innerHTML = '<p style="color: #e74c3c;">Error al cargar estadísticas</p>';
+            }
+        }
+        
+        // Función para procesar PDFs pendientes
+        async function processPendingPDFs() {
+            const processBtn = document.getElementById('processBtn');
+            const messageDiv = document.getElementById('processingMessage');
+            
+            if (!window.PDFTextExtractor || !window.PDFTextExtractor.isPdfJsLoaded()) {
+                messageDiv.innerHTML = '<div class="error">Error: PDF.js no está cargado correctamente</div>';
+                return;
+            }
+            
+            if (!window.PDFBatchProcessor) {
+                messageDiv.innerHTML = '<div class="error">Error: Módulo de procesamiento no disponible</div>';
+                return;
+            }
+            
+            // Configurar PDF.js
+            window.PDFTextExtractor.configurePdfJs();
+            
+            // Deshabilitar botón
+            processBtn.disabled = true;
+            processBtn.innerHTML = '⌛ Procesando...';
+            messageDiv.innerHTML = '<div class="loading">Iniciando procesamiento de PDFs pendientes...</div>';
+            
+            try {
+                const resultado = await window.PDFBatchProcessor.processAllPending();
+                
+                messageDiv.innerHTML = `
+                    <div class="success">
+                        ✅ Procesamiento completado<br>
+                        Procesados: ${resultado.procesados}<br>
+                        Errores: ${resultado.errores}<br>
+                        Total: ${resultado.total}
+                    </div>
+                `;
+                
+                // Recargar estadísticas
+                await loadProcessingStats();
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="error">Error durante el procesamiento: ${error.message}</div>`;
+            } finally {
+                processBtn.disabled = false;
+                processBtn.innerHTML = '🤖 Procesar PDFs Pendientes';
+            }
+        }
     </script>
 </body>
 </html>

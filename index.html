@@ -185,6 +185,11 @@
     <!-- Integraci&oacute;n OpenAI (opcional) -->
     <script src="openai_integration.js"></script>
     
+    <!-- M&oacute;dulos de la aplicaci&oacute;n -->
+    <script src="js/core/utils.js"></script>
+    <script src="js/auth/auth.js"></script>
+    <script src="js/ui/navigation.js"></script>
+    
     <!-- JavaScript -->
     <script>
         // Configuraci&oacute;n de Supabase desde config.js
@@ -739,31 +744,13 @@
             }
         }
         
-        // Manejar formulario de autenticaci&oacute;n
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Inicializaci&oacute;n de m&oacute;dulos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar m&oacute;dulos
+            if (window.Auth) window.Auth.initialize();
+            if (window.Navigation) window.Navigation.initialize();
             
-            const messageDiv = document.getElementById('authMessage');
-            const passwordInput = document.getElementById('password');
-            const password = passwordInput.value;
-            
-            if (!password) {
-                messageDiv.innerHTML = '<div class="error">Por favor ingrese una contrase&ntilde;a</div>';
-                return;
-            }
-            
-            const role = authenticate(password);
-            
-            if (role) {
-                messageDiv.innerHTML = '<div class="success">Acceso autorizado...</div>';
-                setTimeout(() => {
-                    showMainMenu();
-                }, 1000);
-            } else {
-                messageDiv.innerHTML = '<div class="error">Contrase&ntilde;a incorrecta</div>';
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
+            console.log('✅ Aplicaci&oacute;n inicializada correctamente');
         });
         
         // Manejar cambio en input de archivos

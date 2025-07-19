@@ -208,6 +208,7 @@
         
         // Estado de la aplicaci&oacute;n (gestionado por m&oacute;dulos)
         // currentView y userRole son gestionados por Navigation.js y Auth.js
+        let selectedFiles = []; // Array para archivos seleccionados
         
         // Funciones de autenticaci&oacute;n
         function authenticate(password) {
@@ -239,10 +240,13 @@
                 userRoleElement.textContent = 'Usuario';
                 adminButton.style.display = 'none';
             }
+            
+            // currentView gestionado por Auth.js
         }
         
         function logout() {
             userRole = null;
+            // currentView gestionado por Auth.js
             document.getElementById('authScreen').style.display = 'block';
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('actasSection').style.display = 'none';
@@ -260,11 +264,8 @@
             document.getElementById('actasSection').style.display = 'block';
             document.getElementById('adminSection').style.display = 'none';
             document.getElementById('backButton').style.display = 'block';
-            
-            // Cargar actas usando el nuevo módulo
-            if (window.ActasManager && window.ActasManager.loadActas) {
-                window.ActasManager.loadActas();
-            }
+            // currentView gestionado por Navigation.js
+            loadActas();
         }
         
         function showAdmin() {
@@ -276,14 +277,69 @@
             document.getElementById('actasSection').style.display = 'none';
             document.getElementById('adminSection').style.display = 'block';
             document.getElementById('backButton').style.display = 'block';
+            // currentView gestionado por Navigation.js
             
             // Cargar estadísticas de procesamiento
             loadProcessingStats();
         }
         
+
+        
         function goBack() {
             showMainMenu();
         }
+        
+        // Cargar actas desde Supabase
+        async function loadActas() {
+            const actasList = document.getElementById('actasList');
+            actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Error al cargar actas');
+                
+                const actas = await response.json();
+                
+                if (actas.length === 0) {
+                    actasList.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No hay actas disponibles</p>';
+                    return;
+                }
+                
+                actasList.innerHTML = '<div class="actas-list">' + 
+                    actas.map(acta => `
+                        <div class="acta-item">
+                            <div class="acta-main" onclick="openPDF('${acta.archivo_url}')">
+                                <div class="acta-filename">${acta.archivo_nombre || 'Documento sin nombre'}</div>
+                                <div class="acta-summary">${acta.resumen_automatico || 'Resumen no disponible aún'}</div>
+                                <div class="acta-status">${getStatusBadge(acta.estado_procesamiento || 'pendiente')}</div>
+                            </div>
+                            <div class="acta-actions">
+                                <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
+                                    &#129302; Consultar IA
+                                </button>
+                                ${userRole === 'admin' ? `
+                                    <button class="btn-delete" onclick="deleteActa('${acta.id}', '${acta.archivo_nombre || 'esta acta'}')" title="Eliminar acta">
+                                        &#128465; Eliminar
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('') + 
+                    '</div>';
+                    
+            } catch (error) {
+                actasList.innerHTML = '<div class="error">Error al cargar las actas. Por favor, intente m&aacute;s tarde.</div>';
+                console.error('Error:', error);
+            }
+        }
+        
+        // Funciones de formateo eliminadas - ya no se necesitan
         
         // Abrir PDF
         function openPDF(url) {
@@ -294,9 +350,95 @@
             }
         }
         
+        // Funciones de búsqueda
+        async function searchActas(searchTerm) {
+            const searchResultsDiv = document.getElementById('searchResults');
+            const searchResultsList = document.getElementById('searchResultsList');
+            const actasListDiv = document.getElementById('actasList');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            if (!searchTerm || searchTerm.trim() === '') {
+                clearSearch();
+                return;
+            }
+            
+            searchResultsList.innerHTML = '<div class="loading">Buscando...</div>';
+            searchResultsDiv.style.display = 'block';
+            actasListDiv.style.display = 'none';
+            clearBtn.style.display = 'inline-block';
+            
+            try {
+                // Búsqueda directa en la tabla actas usando el campo busqueda_texto
+                const searchQuery = encodeURIComponent(`*${searchTerm}*`);
+                
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?busqueda_texto=ilike.${searchQuery}&order=created_at.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const results = await response.json();
+                
+                if (results.length === 0) {
+                    searchResultsList.innerHTML = '<p class="no-results">No se encontraron resultados para tu b&uacute;squeda.</p>';
+                    return;
+                }
+                
+                searchResultsList.innerHTML = '<div class="actas-list">' + 
+                    results.map(acta => `
+                        <div class="acta-item">
+                            <div class="acta-main" onclick="openPDF('${acta.archivo_url}')">
+                                <div class="acta-filename">${acta.archivo_nombre || acta.titulo || 'Documento sin nombre'}</div>
+                                <div class="acta-summary">${acta.resumen_automatico || 'Resumen no disponible'}</div>
+                                <div class="search-relevance">Encontrado en: ${acta.titulo}</div>
+                            </div>
+                            <div class="acta-actions">
+                                <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
+                                    &#129302; Consultar IA
+                                </button>
+                                ${userRole === 'admin' ? `
+                                    <button class="btn-delete" onclick="deleteActa('${acta.id}', '${acta.archivo_nombre || acta.titulo || 'esta acta'}')" title="Eliminar acta">
+                                        &#128465; Eliminar
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('') + 
+                    '</div>';
+                    
+            } catch (error) {
+                searchResultsList.innerHTML = `<div class="error">Error al realizar la b&uacute;squeda: ${error.message}</div>`;
+                console.error('Error detallado en búsqueda:', error);
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('actasList').style.display = 'block';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+            loadActas();
+        }
+        
         // Variables globales para el modal de IA
         let currentActaId = null;
         let currentActaUrl = null;
+        
+        // Función para obtener badge de estado
+        function getStatusBadge(status) {
+            const badges = {
+                'pendiente': '<span class="status-badge pending">⏳ Pendiente</span>',
+                'procesando': '<span class="status-badge processing">🔄 Procesando</span>',
+                'completado': '<span class="status-badge completed">✅ Completado</span>',
+                'error': '<span class="status-badge error">❌ Error</span>'
+            };
+            return badges[status] || badges['pendiente'];
+        }
         
         // Funciones del modal de IA
         function openAIModal(actaId, title, url, summary) {
@@ -472,6 +614,22 @@
             }
             
             // Si no hay texto extraído, usar respuestas genéricas
+            const responses = {
+                'presupuesto': 'No se pudo extraer el contenido del PDF para analizar información sobre presupuestos.',
+                'acuerdos': 'No se pudo extraer el contenido del PDF para identificar los acuerdos tomados.',
+                'asistentes': 'No se pudo extraer el contenido del PDF para verificar los asistentes.',
+                'votos': 'No se pudo extraer el contenido del PDF para analizar las votaciones.',
+                'fecha': 'No se pudo extraer el contenido del PDF para verificar fechas específicas.',
+                'alcalde': 'No se pudo extraer el contenido del PDF para obtener información sobre el alcalde.'
+            };
+            
+            // Búsqueda simple por palabras clave
+            for (const [key, response] of Object.entries(responses)) {
+                if (query.toLowerCase().includes(key)) {
+                    return response + ' Por favor, consulte el PDF directamente o intente más tarde.';
+                }
+            }
+            
             return 'No se pudo extraer el contenido del PDF para responder su consulta. Por favor, consulte el documento directamente haciendo clic en "Ver PDF".';
         }
         
@@ -533,6 +691,286 @@
                 console.error('Error al cargar historial:', error);
             }
         }
+        
+        // Inicializaci&oacute;n de m&oacute;dulos
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Cargar configuraci&oacute;n centralizada
+                if (window.AppConfig) {
+                    const config = window.AppConfig.load();
+                    
+                    // Establecer variables globales
+                    SUPABASE_URL = config.SUPABASE_URL;
+                    SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+                    PASSWORD_USER = config.PASSWORD_USER;
+                    PASSWORD_ADMIN = config.PASSWORD_ADMIN;
+                    OPENAI_API_KEY = config.OPENAI_API_KEY;
+                    AI_MODEL = config.AI_MODEL;
+                } else {
+                    // Fallback a configuraci&oacute;n b&aacute;sica
+                    SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
+                    SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
+                    PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || 'usuario123';
+                    PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || 'admin123';
+                    OPENAI_API_KEY = window.APP_CONFIG?.OPENAI_API_KEY || '';
+                    AI_MODEL = window.APP_CONFIG?.AI_MODEL || 'gpt-4o-mini';
+                }
+                
+                // Verificar configuraci&oacute;n cr&iacute;tica
+                if (!SUPABASE_ANON_KEY) {
+                    console.warn('⚠️ SUPABASE_ANON_KEY no configurada');
+                }
+                
+                // Inicializar m&oacute;dulos
+                if (window.Auth) window.Auth.initialize();
+                if (window.Navigation) window.Navigation.initialize();
+                
+                console.log('✅ Aplicaci&oacute;n inicializada correctamente');
+            } catch (error) {
+                console.error('❌ Error inicializando aplicaci&oacute;n:', error);
+            }
+        });
+        
+        // Manejar cambio en input de archivos
+        document.getElementById('pdfFile').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            selectedFiles = files;
+            displaySelectedFiles();
+        });
+        
+        // Función para mostrar archivos seleccionados
+        function displaySelectedFiles() {
+            const filesList = document.getElementById('selectedFilesList');
+            const filesContainer = document.getElementById('filesContainer');
+            
+            if (selectedFiles.length === 0) {
+                filesList.style.display = 'none';
+                return;
+            }
+            
+            filesList.style.display = 'block';
+            filesContainer.innerHTML = selectedFiles.map((file, index) => `
+                <div class="file-item" id="file-${index}">
+                    <span class="file-name">📄 ${file.name}</span>
+                    <span class="file-size">(${formatFileSize(file.size)})</span>
+                    <button type="button" class="btn-remove-file" onclick="removeFile(${index})" title="Eliminar archivo">
+                        ❌
+                    </button>
+                    <div class="file-status" id="status-${index}"></div>
+                </div>
+            `).join('');
+        }
+        
+        // Función para formatear tamaño de archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Función para eliminar archivo de la lista
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displaySelectedFiles();
+            
+            // Si no quedan archivos, limpiar el input
+            if (selectedFiles.length === 0) {
+                document.getElementById('pdfFile').value = '';
+            }
+        }
+        
+        // Manejar formulario de carga
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('uploadMessage');
+            
+            if (selectedFiles.length === 0) {
+                messageDiv.innerHTML = '<div class="error">Por favor seleccione al menos un archivo PDF</div>';
+                return;
+            }
+            
+            // Deshabilitar el botón de subida durante el proceso
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="btn-icon">⏳</span> Subiendo...';
+            
+            // Mostrar progreso general
+            messageDiv.innerHTML = `
+                <div class="upload-progress">
+                    <h4>Subiendo archivos...</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="mainProgressBar" style="width: 0%"></div>
+                    </div>
+                    <div id="progressText">0 de ${selectedFiles.length} archivos</div>
+                </div>
+            `;
+            
+            let successCount = 0;
+            let errorCount = 0;
+            const results = [];
+            
+            // Procesar cada archivo secuencialmente
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const fileStatusDiv = document.getElementById(`status-${i}`);
+                
+                // Actualizar progreso
+                const progress = Math.round(((i) / selectedFiles.length) * 100);
+                document.getElementById('mainProgressBar').style.width = `${progress}%`;
+                document.getElementById('progressText').textContent = `${i} de ${selectedFiles.length} archivos`;
+                
+                // Marcar archivo como procesando
+                fileStatusDiv.innerHTML = '<span style="color: #3498db;">🔄 Subiendo...</span>';
+                
+                try {
+                    await uploadSingleFile(file);
+                    successCount++;
+                    fileStatusDiv.innerHTML = '<span style="color: #27ae60;">✅ Subido correctamente</span>';
+                    results.push({ file: file.name, status: 'success' });
+                } catch (error) {
+                    errorCount++;
+                    fileStatusDiv.innerHTML = `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`;
+                    results.push({ file: file.name, status: 'error', error: error.message });
+                }
+            }
+            
+            // Actualizar progreso final
+            document.getElementById('mainProgressBar').style.width = '100%';
+            document.getElementById('progressText').textContent = `${selectedFiles.length} de ${selectedFiles.length} archivos`;
+            
+            // Mostrar resumen
+            messageDiv.innerHTML = `
+                <div class="${successCount > 0 ? 'success' : 'error'}">
+                    <h4>Proceso completado</h4>
+                    <p>✅ Exitosos: ${successCount}</p>
+                    <p>❌ Errores: ${errorCount}</p>
+                </div>
+            `;
+            
+            // Habilitar el botón nuevamente
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="btn-icon">📄</span> Subir Acta';
+            
+            // Limpiar la selección si todos fueron exitosos
+            if (errorCount === 0) {
+                selectedFiles = [];
+                document.getElementById('pdfFile').value = '';
+                displaySelectedFiles();
+                
+                // Volver al menú después de 3 segundos
+                setTimeout(goBack, 3000);
+            }
+        });
+        
+        // Función para subir un archivo individual
+        async function uploadSingleFile(pdfFile) {
+            // Validar tamaño del archivo (50MB max)
+            if (pdfFile.size > 50 * 1024 * 1024) {
+                throw new Error('Archivo demasiado grande. Máximo 50MB');
+            }
+            
+            // Validar tipo de archivo
+            if (pdfFile.type !== 'application/pdf') {
+                throw new Error('Solo se permiten archivos PDF');
+            }
+            
+            // Generar nombre único para el archivo
+            const timestamp = new Date().getTime();
+            const fileName = `acta_${timestamp}_${pdfFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+            
+            // Subir archivo a Supabase Storage
+            const uploadResponse = await fetch(`${SUPABASE_URL}/storage/v1/object/actas-pdfs/${fileName}`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'x-upsert': 'true'
+                },
+                body: pdfFile
+            });
+            
+            if (!uploadResponse.ok) {
+                const errorData = await uploadResponse.text();
+                console.error('Error de upload:', errorData);
+                throw new Error('Error al subir el archivo');
+            }
+            
+            // Construir URL pública del archivo
+            const archivoUrl = `${SUPABASE_URL}/storage/v1/object/public/actas-pdfs/${fileName}`;
+            
+            // Extraer fecha del nombre si es posible
+            const fechaActual = new Date().toISOString().split('T')[0];
+            
+            // Configurar PDF.js si no está configurado
+            if (window.PDFTextExtractor && window.PDFTextExtractor.isPdfJsLoaded()) {
+                window.PDFTextExtractor.configurePdfJs();
+            }
+            
+            // Extraer texto del PDF
+            let textoExtraido = '';
+            let resumenAutomatico = '';
+            
+            try {
+                if (window.PDFTextExtractor && window.PDFTextExtractor.isPdfJsLoaded()) {
+                    textoExtraido = await window.PDFTextExtractor.extractTextFromFile(pdfFile);
+                    resumenAutomatico = window.PDFTextExtractor.generateSummary(textoExtraido, 500);
+                    console.log('Texto extraído exitosamente:', textoExtraido.length, 'caracteres');
+                } else {
+                    console.warn('PDF.js no está disponible, subiendo sin extracción de texto');
+                }
+            } catch (extractError) {
+                console.error('Error al extraer texto del PDF:', extractError);
+                // Continuar sin texto extraído
+            }
+            
+            // Insertar acta en la base de datos con valores simplificados
+            const actaData = {
+                titulo: pdfFile.name,
+                fecha: fechaActual,
+                numero_acta: `AUTO-${timestamp}`,
+                descripcion: null,
+                archivo_url: archivoUrl,
+                archivo_nombre: pdfFile.name,
+                archivo_tamano: pdfFile.size,
+                tipo_sesion: 'ordinaria',
+                estado: 'borrador',
+                texto_extraido: textoExtraido || null,
+                resumen_automatico: resumenAutomatico || null,
+                estado_procesamiento: textoExtraido ? 'completado' : 'pendiente'
+            };
+            
+            const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(actaData)
+            });
+            
+            if (!insertResponse.ok) {
+                const errorData = await insertResponse.text();
+                console.error('Error al insertar acta:', errorData);
+                throw new Error('Error al guardar el acta');
+            }
+            
+            // Éxito - retornar datos del acta insertada
+            return await insertResponse.json();
+        }
+        
+        // Manejar formulario de búsqueda
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm) {
+                await searchActas(searchTerm);
+            }
+        });
         
         // Función para cargar estadísticas de procesamiento
         async function loadProcessingStats() {
@@ -632,50 +1070,6 @@
                 processBtn.innerHTML = '🤖 Procesar PDFs Pendientes';
             }
         }
-        
-        // Inicializaci&oacute;n de m&oacute;dulos
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                // Cargar configuraci&oacute;n centralizada
-                if (window.AppConfig) {
-                    const config = window.AppConfig.load();
-                    
-                    // Establecer variables globales
-                    SUPABASE_URL = config.SUPABASE_URL;
-                    SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
-                    PASSWORD_USER = config.PASSWORD_USER;
-                    PASSWORD_ADMIN = config.PASSWORD_ADMIN;
-                    OPENAI_API_KEY = config.OPENAI_API_KEY;
-                    AI_MODEL = config.AI_MODEL;
-                } else {
-                    // Fallback a configuraci&oacute;n b&aacute;sica
-                    SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
-                    SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
-                    PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || 'usuario123';
-                    PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || 'admin123';
-                    OPENAI_API_KEY = window.APP_CONFIG?.OPENAI_API_KEY || '';
-                    AI_MODEL = window.APP_CONFIG?.AI_MODEL || 'gpt-4o-mini';
-                }
-                
-                // Verificar configuraci&oacute;n cr&iacute;tica
-                if (!SUPABASE_ANON_KEY) {
-                    console.warn('⚠️ SUPABASE_ANON_KEY no configurada');
-                }
-                
-                // Inicializar m&oacute;dulos
-                if (window.Auth) window.Auth.initialize();
-                if (window.Navigation) window.Navigation.initialize();
-                if (window.ActasManager) window.ActasManager.initialize();
-                if (window.SearchManager) window.SearchManager.initialize();
-                if (window.DeleteManager) window.DeleteManager.initialize();
-                if (window.FileManager) window.FileManager.initialize();
-                if (window.UploadManager) window.UploadManager.initialize();
-                
-                console.log('✅ Aplicaci&oacute;n inicializada correctamente');
-            } catch (error) {
-                console.error('❌ Error inicializando aplicaci&oacute;n:', error);
-            }
-        });
     </script>
 </body>
 </html>

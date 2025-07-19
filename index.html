@@ -186,49 +186,26 @@
     <script src="openai_integration.js"></script>
     
     <!-- M&oacute;dulos de la aplicaci&oacute;n -->
+    <script src="js/core/config.js"></script>
     <script src="js/core/utils.js"></script>
     <script src="js/auth/auth.js"></script>
     <script src="js/ui/navigation.js"></script>
     
     <!-- JavaScript -->
     <script>
-        // Configuraci&oacute;n de Supabase desde config.js
-        const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
-        const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
-        const PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || 'usuario123';
-        const PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || 'admin123';
-        const OPENAI_API_KEY = window.APP_CONFIG?.OPENAI_API_KEY || '';
-        const AI_MODEL = window.APP_CONFIG?.AI_MODEL || 'gpt-4o-mini';
+        // Configuraci&oacute;n centralizada
+        const config = window.AppConfig.load();
         
-        // Verificar configuraci&oacute;n
-        if (!SUPABASE_ANON_KEY) {
-            console.error('SUPABASE_ANON_KEY no configurada');
-            // Mostrar error crítico en producción
-            document.body.innerHTML = `
-                <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #f8f9fa;">
-                    <div style="text-align: center; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px;">
-                        <h2 style="color: #dc3545; margin-bottom: 1rem;">⚠️ Error de Configuración</h2>
-                        <p style="margin-bottom: 1rem;">La aplicación no está configurada correctamente.</p>
-                        <p style="font-size: 0.9rem; color: #666;">Contacte al administrador del sistema.</p>
-                    </div>
-                </div>
-            `;
-            throw new Error('Configuración incompleta'); // Detener ejecución
-        } else {
-            console.log('Supabase configurado correctamente');
-        }
+        // Variables globales para compatibilidad
+        const SUPABASE_URL = config.SUPABASE_URL;
+        const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+        const PASSWORD_USER = config.PASSWORD_USER;
+        const PASSWORD_ADMIN = config.PASSWORD_ADMIN;
+        const OPENAI_API_KEY = config.OPENAI_API_KEY;
+        const AI_MODEL = config.AI_MODEL;
         
-        // Debug: Mostrar variables cargadas (solo en desarrollo)
-        console.log('=== DEBUG VARIABLES ===');
-        console.log('SUPABASE_URL:', SUPABASE_URL);
-        console.log('SUPABASE_ANON_KEY:', SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA');
-        console.log('PASSWORD_USER:', PASSWORD_USER ? '***configurada***' : 'NO CONFIGURADA');
-        console.log('PASSWORD_ADMIN:', PASSWORD_ADMIN ? '***configurada***' : 'NO CONFIGURADA');
-        console.log('========================');
-        
-        // Estado de la aplicaci&oacute;n
-        let currentView = 'auth';
-        let userRole = null; // 'user' o 'admin'
+        // Estado de la aplicaci&oacute;n (gestionado por m&oacute;dulos)
+        // currentView y userRole son gestionados por Navigation.js y Auth.js
         let selectedFiles = []; // Array para archivos seleccionados
         
         // Funciones de autenticaci&oacute;n
@@ -262,12 +239,12 @@
                 adminButton.style.display = 'none';
             }
             
-            currentView = 'menu';
+            // currentView gestionado por Auth.js
         }
         
         function logout() {
             userRole = null;
-            currentView = 'auth';
+            // currentView gestionado por Auth.js
             document.getElementById('authScreen').style.display = 'block';
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('actasSection').style.display = 'none';
@@ -285,7 +262,7 @@
             document.getElementById('actasSection').style.display = 'block';
             document.getElementById('adminSection').style.display = 'none';
             document.getElementById('backButton').style.display = 'block';
-            currentView = 'actas';
+            // currentView gestionado por Navigation.js
             loadActas();
         }
         
@@ -298,7 +275,7 @@
             document.getElementById('actasSection').style.display = 'none';
             document.getElementById('adminSection').style.display = 'block';
             document.getElementById('backButton').style.display = 'block';
-            currentView = 'admin';
+            // currentView gestionado por Navigation.js
             
             // Cargar estadísticas de procesamiento
             loadProcessingStats();
@@ -746,11 +723,15 @@
         
         // Inicializaci&oacute;n de m&oacute;dulos
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar m&oacute;dulos
-            if (window.Auth) window.Auth.initialize();
-            if (window.Navigation) window.Navigation.initialize();
-            
-            console.log('✅ Aplicaci&oacute;n inicializada correctamente');
+            try {
+                // Inicializar m&oacute;dulos
+                if (window.Auth) window.Auth.initialize();
+                if (window.Navigation) window.Navigation.initialize();
+                
+                console.log('✅ Aplicaci&oacute;n inicializada correctamente');
+            } catch (error) {
+                console.error('❌ Error inicializando aplicaci&oacute;n:', error);
+            }
         });
         
         // Manejar cambio en input de archivos

@@ -292,6 +292,39 @@
             loadProcessingStats();
         }
         
+        // Función para eliminar acta
+        async function deleteActa(actaId, actaNombre) {
+            // Confirmación antes de eliminar
+            if (!confirm(`¿Está seguro de que desea eliminar el acta "${actaNombre}"?\n\nEsta acción no se puede deshacer.`)) {
+                return;
+            }
+            
+            try {
+                // Eliminar de la base de datos
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${actaId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al eliminar el acta');
+                }
+                
+                // Mostrar mensaje de éxito
+                alert('Acta eliminada correctamente');
+                
+                // Recargar la lista de actas
+                loadActas();
+                
+            } catch (error) {
+                alert(`Error al eliminar el acta: ${error.message}`);
+                console.error('Error:', error);
+            }
+        }
+        
         function goBack() {
             showMainMenu();
         }
@@ -330,6 +363,11 @@
                                 <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
                                     &#129302; Consultar IA
                                 </button>
+                                ${userRole === 'admin' ? `
+                                    <button class="btn-delete" onclick="deleteActa('${acta.id}', '${acta.archivo_nombre || 'esta acta'}')" title="Eliminar acta">
+                                        &#128465; Eliminar
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
                     `).join('') + 
@@ -403,6 +441,11 @@
                                 <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
                                     &#129302; Consultar IA
                                 </button>
+                                ${userRole === 'admin' ? `
+                                    <button class="btn-delete" onclick="deleteActa('${acta.id}', '${acta.archivo_nombre || acta.titulo || 'esta acta'}')" title="Eliminar acta">
+                                        &#128465; Eliminar
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
                     `).join('') + 

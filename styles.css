@@ -1006,6 +1006,29 @@ label {
     box-shadow: var(--shadow-lg);
 }
 
+.btn-delete {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    background: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+    margin-left: var(--spacing-sm);
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
 /* ============================================
    Modal de consulta IA
    ============================================ */

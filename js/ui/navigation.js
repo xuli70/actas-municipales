@@ -112,8 +112,7 @@ window.Navigation = {
         this.state.previousView = this.state.currentView;
         this.state.currentView = view;
         
-        // Actualizar variable global para compatibilidad
-        window.currentView = view;
+        // La variable global se actualiza automáticamente vía Object.defineProperty
     },
 
     /**

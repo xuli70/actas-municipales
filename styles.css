@@ -1010,10 +1010,10 @@ label {
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-base);
     font-weight: 600;
-    background: var(--color-danger);
+    background: var(--color-accent);
     color: white;
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-flex;
@@ -1024,7 +1024,7 @@ label {
 }
 
 .btn-delete:hover {
-    background: #dc2626;
+    background: var(--color-accent-dark);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
@@ -1276,5 +1276,200 @@ label {
     .status-badge.error {
         background: #7f1d1d;
         color: #f87171;
+    }
+}
+
+/* ============================================
+   Subida múltiple de archivos
+   ============================================ */
+.selected-files-list {
+    background: var(--color-bg-accent);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border: 2px solid var(--color-border);
+    animation: slideIn 0.3s ease-out;
+}
+
+.selected-files-list h4 {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm);
+    border: 1px solid var(--color-border);
+    transition: all 0.3s ease;
+    gap: var(--spacing-md);
+}
+
+.file-item:last-child {
+    margin-bottom: 0;
+}
+
+.file-item:hover {
+    background: var(--color-bg-accent);
+    box-shadow: var(--shadow-sm);
+}
+
+.file-name {
+    flex: 1;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.file-size {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    margin-left: var(--spacing-sm);
+}
+
+.btn-remove-file {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-left: var(--spacing-sm);
+}
+
+.btn-remove-file:hover {
+    background: var(--color-accent-dark);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.file-status {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    margin-left: var(--spacing-sm);
+}
+
+/* Barra de progreso para subida múltiple */
+.upload-progress {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-primary);
+    animation: slideIn 0.5s ease-out;
+}
+
+.upload-progress h4 {
+    margin: 0 0 var(--spacing-lg) 0;
+    color: var(--color-primary);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 24px;
+    background: var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: var(--spacing-lg) 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    transition: width 0.5s ease;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+#progressText {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    margin-top: var(--spacing-md);
+}
+
+/* Responsive para subida múltiple */
+@media (max-width: 768px) {
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .file-size,
+    .file-status {
+        margin-left: 0;
+        align-self: flex-start;
+    }
+    
+    .btn-remove-file {
+        margin-left: 0;
+        align-self: flex-end;
+        position: absolute;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+    }
+    
+    .file-item {
+        position: relative;
+        padding-right: 50px;
+    }
+}
+
+/* Modo oscuro para subida múltiple */
+@media (prefers-color-scheme: dark) {
+    .selected-files-list {
+        background: var(--color-bg-accent);
+    }
+    
+    .file-item {
+        background: var(--color-bg-primary);
+    }
+    
+    .file-item:hover {
+        background: var(--color-bg-accent);
+    }
+    
+    .upload-progress {
+        background: var(--color-bg-primary);
     }
 }

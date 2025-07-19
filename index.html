@@ -193,16 +193,9 @@
     
     <!-- JavaScript -->
     <script>
-        // Configuraci&oacute;n centralizada
-        const config = window.AppConfig.load();
-        
-        // Variables globales para compatibilidad
-        const SUPABASE_URL = config.SUPABASE_URL;
-        const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
-        const PASSWORD_USER = config.PASSWORD_USER;
-        const PASSWORD_ADMIN = config.PASSWORD_ADMIN;
-        const OPENAI_API_KEY = config.OPENAI_API_KEY;
-        const AI_MODEL = config.AI_MODEL;
+        // Configuraci&oacute;n desde m&uacute;ltiples fuentes
+        // Las variables globales se establecen al cargar los m&oacute;dulos
+        let SUPABASE_URL, SUPABASE_ANON_KEY, PASSWORD_USER, PASSWORD_ADMIN, OPENAI_API_KEY, AI_MODEL;
         
         // Estado de la aplicaci&oacute;n (gestionado por m&oacute;dulos)
         // currentView y userRole son gestionados por Navigation.js y Auth.js
@@ -724,6 +717,32 @@
         // Inicializaci&oacute;n de m&oacute;dulos
         document.addEventListener('DOMContentLoaded', function() {
             try {
+                // Cargar configuraci&oacute;n centralizada
+                if (window.AppConfig) {
+                    const config = window.AppConfig.load();
+                    
+                    // Establecer variables globales
+                    SUPABASE_URL = config.SUPABASE_URL;
+                    SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+                    PASSWORD_USER = config.PASSWORD_USER;
+                    PASSWORD_ADMIN = config.PASSWORD_ADMIN;
+                    OPENAI_API_KEY = config.OPENAI_API_KEY;
+                    AI_MODEL = config.AI_MODEL;
+                } else {
+                    // Fallback a configuraci&oacute;n b&aacute;sica
+                    SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
+                    SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
+                    PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || 'usuario123';
+                    PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || 'admin123';
+                    OPENAI_API_KEY = window.APP_CONFIG?.OPENAI_API_KEY || '';
+                    AI_MODEL = window.APP_CONFIG?.AI_MODEL || 'gpt-4o-mini';
+                }
+                
+                // Verificar configuraci&oacute;n cr&iacute;tica
+                if (!SUPABASE_ANON_KEY) {
+                    console.warn('⚠️ SUPABASE_ANON_KEY no configurada');
+                }
+                
                 // Inicializar m&oacute;dulos
                 if (window.Auth) window.Auth.initialize();
                 if (window.Navigation) window.Navigation.initialize();

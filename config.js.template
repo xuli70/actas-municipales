@@ -1,6 +1,9 @@
-// Archivo de configuraci?n generado din?micamente
-// NO EDITAR - Este archivo se genera autom?ticamente desde las variables de entorno
+/**
+ * config.js.template - Template para generar config.js con variables de entorno
+ * Este archivo es procesado por envsubst en el Dockerfile
+ */
 
+// Configuración desde variables de entorno de Coolify
 window.APP_CONFIG = {
     SUPABASE_URL: '${SUPABASE_URL}',
     SUPABASE_ANON_KEY: '${SUPABASE_ANON_KEY}',
@@ -9,3 +12,15 @@ window.APP_CONFIG = {
     OPENAI_API_KEY: '${OPENAI_API_KEY}',
     AI_MODEL: '${AI_MODEL}'
 };
+
+// También inyectar en window.env para el nuevo sistema
+window.env = {
+    SUPABASE_URL: '${SUPABASE_URL}',
+    SUPABASE_ANON_KEY: '${SUPABASE_ANON_KEY}',
+    PASSWORD_USER: '${PASSWORD_USER}',
+    PASSWORD_ADMIN: '${PASSWORD_ADMIN}',
+    OPENAI_API_KEY: '${OPENAI_API_KEY}',
+    AI_MODEL: '${AI_MODEL}'
+};
+
+console.log('🚀 config.js generado desde variables de entorno (Coolify)');

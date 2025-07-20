@@ -64,28 +64,86 @@ window.PDFTextExtractor = {
     generateSummary(text, maxLength = 500) {
         if (!text) return '';
         
-        // Limpiar texto de saltos de línea múltiples y espacios extras
+        // Limpiar texto y remover información irrelevante
         const cleanText = text
             .replace(/\n{3,}/g, '\n\n')
             .replace(/\s+/g, ' ')
+            // Remover encabezados municipales repetitivos
+            .replace(/C\/\s*La\s+Fuente,?\s*2\s*[–\-]\s*06830\s+LA\s+ZARZA[^\.]*\.?/gi, '')
+            .replace(/Telf\.?\s*924366001[^\.]*\.?/gi, '')
+            .replace(/Web:\s*www\.lazarza\.net[^\.]*\.?/gi, '')
+            .replace(/E-mail:\s*registro@lazarza\.es[^\.]*\.?/gi, '')
+            // Remover fechas y tipos de sesión (ya están en el nombre del archivo)
+            .replace(/\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}/g, '')
+            .replace(/sesión\s+(?:ordinaria|extraordinaria)/gi, '')
+            .replace(/asistentes?\s*:?[^\.]{0,200}\.?/gi, '')
             .trim();
         
-        // Si el texto es corto, devolverlo completo
-        if (cleanText.length <= maxLength) {
-            return cleanText;
+        // Buscar elementos clave de actas municipales
+        const patterns = {
+            temas: /(?:punto|tema|asunto)\s*\d*[\.:\-]?\s*([^\.]{20,150}\.)/gi,
+            acuerdos: /(?:se\s+(?:aprueba|adopta|acuerda)|acuerdo|decisión|resolución)\s*:?\s*([^\.]{20,200}\.)/gi,
+            presupuestos: /(?:presupuesto|importe|cantidad|euros?|€)\s*[^\.]{0,100}(?:\d+[.,]\d+|\d+)\s*(?:euros?|€)?[^\.]{0,50}\./gi
+        };
+        
+        let summary = '';
+        let usedText = new Set();
+        
+        // Extraer temas tratados
+        const temasMatches = Array.from(cleanText.matchAll(patterns.temas));
+        if (temasMatches.length > 0) {
+            const tema = temasMatches[0][1].trim();
+            if (!usedText.has(tema.toLowerCase())) {
+                summary += `Tema: ${tema} `;
+                usedText.add(tema.toLowerCase());
+            }
         }
         
-        // Buscar el final de una oración cerca del límite
-        let summary = cleanText.substring(0, maxLength);
-        const lastPeriod = summary.lastIndexOf('.');
-        const lastComma = summary.lastIndexOf(',');
+        // Extraer acuerdos principales
+        const acuerdosMatches = Array.from(cleanText.matchAll(patterns.acuerdos));
+        if (acuerdosMatches.length > 0) {
+            const acuerdo = acuerdosMatches[0][1].trim();
+            if (!usedText.has(acuerdo.toLowerCase()) && acuerdo.length > 20) {
+                summary += `Acuerdo: ${acuerdo} `;
+                usedText.add(acuerdo.toLowerCase());
+            }
+        }
         
-        // Cortar en el punto más cercano (. o ,)
-        const cutPoint = Math.max(lastPeriod, lastComma);
-        if (cutPoint > maxLength * 0.8) {
-            summary = summary.substring(0, cutPoint + 1);
-        } else {
-            summary += '...';
+        // Extraer información de presupuestos
+        const presupuestoMatches = Array.from(cleanText.matchAll(patterns.presupuestos));
+        if (presupuestoMatches.length > 0) {
+            const presupuesto = presupuestoMatches[0][0].trim();
+            if (!usedText.has(presupuesto.toLowerCase())) {
+                summary += `${presupuesto} `;
+                usedText.add(presupuesto.toLowerCase());
+            }
+        }
+        
+        // Si no se encontró información estructurada, usar los primeros párrafos relevantes
+        if (summary.length < 50) {
+            const paragraphs = cleanText.split(/\.\s+/).filter(p => 
+                p.length > 30 && 
+                !p.toLowerCase().includes('asistente') &&
+                !p.toLowerCase().includes('presente') &&
+                !p.toLowerCase().includes('alcalde') &&
+                !p.toLowerCase().includes('secretari')
+            );
+            
+            if (paragraphs.length > 0) {
+                summary = paragraphs[0].substring(0, maxLength - 3) + '...';
+            } else {
+                summary = cleanText.substring(0, maxLength - 3) + '...';
+            }
+        }
+        
+        // Truncar al límite máximo
+        if (summary.length > maxLength) {
+            const lastPeriod = summary.lastIndexOf('.', maxLength);
+            if (lastPeriod > maxLength * 0.7) {
+                summary = summary.substring(0, lastPeriod + 1);
+            } else {
+                summary = summary.substring(0, maxLength - 3) + '...';
+            }
         }
         
         return summary.trim();

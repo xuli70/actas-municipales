@@ -188,16 +188,27 @@ Environment variables are injected via `config.js.template`:
 ### Previous Critical Bug Fixed (2025-07-19)
 - **Navigation recursion**: RESOLVED and deployed successfully
 
-### Next Phase: Environment Variables Resolution (URGENT)
-- **Priority**: Deploy debugging changes and analyze logs in production
-- **Target**: Resolve Coolify environment variable injection issues
-- **Expected**: AI system to work correctly in production environment
-- **Debugging Tools**: Comprehensive logging system implemented
+### Next Phase: Environment Variables Resolution (COMPLETED)
+- **Status**: ✅ RESOLVED - Environment variables now working correctly in production
+- **AI System**: Fully functional in production environment
+- **Deployment**: Successfully tested and validated
+
+### Summary Generation Enhancement (COMPLETED - 2025-07-20)
+- **Objective**: Improve automatic summary quality by extracting relevant municipal content
+- **Implementation**: Enhanced `pdf_text_extractor.js:generateSummary()` function
+- **Algorithm**: Replaced basic truncation with intelligent content extraction
+- **Features**:
+  - Removes repetitive municipal headers and administrative text
+  - Extracts topics, agreements, and budget information using regex patterns
+  - Provides structured output: "Tema: [topic]. Acuerdo: [agreement]. [budget]"
+  - Maintains 500-character limit with intelligent sentence-boundary truncation
+- **Status**: ✅ DEPLOYED and tested successfully
 
 ### Refactorization COMPLETED
 - **Final Result**: 69% reduction achieved (51KB → 16KB)
 - **Target Exceeded**: Goal was 15KB, achieved 16KB
 - **Architecture**: Complete modular system with 7 organized directories
+- **Summary Quality**: Enhanced with intelligent content extraction
 
 ## Security Notes
 

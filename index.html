@@ -57,6 +57,27 @@
                 Actas Disponibles
             </h2>
             
+            <!-- Consulta IA M&uacute;ltiple -->
+            <div class="multi-ai-controls">
+                <button class="btn-start-selection" onclick="window.MultiSelector.enterSelectionMode()">
+                    ☑️ Seleccionar Actas para Consulta IA
+                </button>
+            </div>
+            
+            <div class="multi-ai-section" style="display: none;" id="multiAISection">
+                <div class="multi-ai-header">
+                    <button class="btn-multi-ai" onclick="window.MultiAIModal.open()">
+                        🤖 Consultar IA - M&uacute;ltiples Actas (<span id="selectedCount">0</span>)
+                    </button>
+                    <button class="btn-cancel-selection" onclick="window.MultiSelector.exitSelectionMode()">
+                        ❌ Cancelar Selecci&oacute;n
+                    </button>
+                </div>
+                <div class="selection-summary">
+                    <span id="selectionSummary">No hay actas seleccionadas</span>
+                </div>
+            </div>
+            
             <!-- B&uacute;squeda -->
             <div class="search-container">
                 <form id="searchForm">
@@ -123,6 +144,57 @@
                 <div class="modal-footer">
                     <button class="btn" onclick="openPDF(currentActaUrl)">&#128196; Ver PDF</button>
                     <button class="btn btn-secondary" onclick="closeAIModal()">Cerrar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de consulta IA m&uacute;ltiple -->
+        <div id="multiActasAIModal" class="modal" style="display: none;">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3>🤖 Consulta IA - M&uacute;ltiples Actas</h3>
+                    <button class="modal-close" onclick="window.MultiAIModal.close()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Lista de actas seleccionadas -->
+                    <div class="selected-actas-summary">
+                        <h4>📋 Actas Seleccionadas:</h4>
+                        <div id="selectedActasList" class="selected-actas-list"></div>
+                    </div>
+                    
+                    <!-- &Aacute;rea de consulta -->
+                    <div class="ai-query-section">
+                        <label for="multiAIQuery">Pregunta sobre las actas seleccionadas:</label>
+                        <textarea id="multiAIQuery" 
+                                  class="ai-query-input" 
+                                  placeholder="Ejemplo: &iquest;Cu&aacute;les fueron los temas principales tratados en estos plenos? &iquest;Qu&eacute; presupuestos se aprobaron? &iquest;Hubo votaciones en contra?"
+                                  rows="4"></textarea>
+                        <div class="query-suggestions">
+                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('&iquest;Cu&aacute;les fueron los temas principales?')">💡 Temas principales</button>
+                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('&iquest;Qu&eacute; presupuestos se aprobaron?')">💰 Presupuestos</button>
+                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('&iquest;Hubo votaciones en contra?')">🗳️ Votaciones</button>
+                        </div>
+                        <button id="askMultiAIBtn" class="btn btn-primary" onclick="window.MultiAIManager.askMultiAI()">
+                            🤖 Preguntar a la IA
+                        </button>
+                    </div>
+                    
+                    <!-- Respuesta de IA -->
+                    <div id="multiAIResponse" class="ai-response" style="display: none;">
+                        <h4>📋 Respuesta An&aacute;lisis M&uacute;ltiple:</h4>
+                        <div id="multiAIResponseText"></div>
+                    </div>
+                    
+                    <!-- Historial de consultas m&uacute;ltiples -->
+                    <div id="multiQueryHistory" class="query-history" style="display: none;">
+                        <h4>📚 Historial de Consultas M&uacute;ltiples:</h4>
+                        <div id="multiHistoryList"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="window.MultiSelector.selectAll()">☑️ Seleccionar Todas</button>
+                    <button class="btn" onclick="window.MultiSelector.clearSelection()">❌ Limpiar Selecci&oacute;n</button>
+                    <button class="btn btn-secondary" onclick="window.MultiAIModal.close()">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -204,6 +276,12 @@
     <script src="js/ai/ai-modal.js"></script>
     <script src="js/ai/ai-history.js"></script>
     <script src="js/ai/ai-manager.js"></script>
+    
+    <!-- M&oacute;dulos de IA M&uacute;ltiple -->
+    <script src="js/ai/multi-selector.js"></script>
+    <script src="js/ai/multi-modal.js"></script>
+    <script src="js/ai/multi-manager.js"></script>
+    <script src="js/ai/multi-history.js"></script>
     
     <!-- M&oacute;dulos de Procesamiento -->
     <script src="js/processing/stats-manager.js"></script>
@@ -352,6 +430,13 @@
                 if (window.AIModal) window.AIModal.initialize();
                 if (window.AIHistory) window.AIHistory.initialize();
                 if (window.AIManager) window.AIManager.initialize();
+                
+                // M&oacute;dulos de IA M&uacute;ltiple
+                if (window.MultiSelector) window.MultiSelector.initialize();
+                if (window.MultiAIModal) window.MultiAIModal.initialize();
+                if (window.MultiAIManager) window.MultiAIManager.initialize();
+                if (window.MultiHistory) window.MultiHistory.initialize();
+                
                 if (window.StatsManager) window.StatsManager.initialize();
                 if (window.BatchProcessor) window.BatchProcessor.initialize();
                 

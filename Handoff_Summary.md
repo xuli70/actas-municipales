@@ -227,14 +227,49 @@ js/
 
 ---
 
-## 🔍 Troubleshooting Context for Next Session
+## 🔍 Current Status Update (2025-07-20)
 
-**Current Issue**: AI functionality works locally but fails in production due to environment variable configuration.
+**Environment Variables Issue**: ✅ RESOLVED - AI system now working correctly in production
 
-**Debugging Tools Ready**: Comprehensive logging system implemented to diagnose the exact failure point in the Coolify → Docker → App configuration flow.
+**Summary Generation Enhancement**: ✅ COMPLETED - Intelligent content extraction implemented
 
-**Expected Resolution**: Once environment variables are properly loaded, the AI system should work seamlessly as all code logic is verified and functional.
+**System Status**: All features fully functional in production environment
 
 ---
 
-*Session 3 completed successfully with refactorization goals exceeded. Primary focus for next session: resolve environment variable configuration for full production functionality.*
+## ✅ Latest Session Accomplishments (2025-07-20)
+
+### **Summary Algorithm Enhancement**
+- **Problem**: Basic summary generation only truncated text without extracting relevant content
+- **Solution**: Implemented intelligent content extraction using regex patterns
+- **Implementation**: Enhanced `pdf_text_extractor.js:generateSummary()` function
+- **Features**:
+  - Removes repetitive municipal headers (address, phone, email)
+  - Filters out dates, session types, and attendee lists (already in filename)
+  - Extracts topics, agreements, and budget information
+  - Structured output format: "Tema: [topic]. Acuerdo: [agreement]. [budget]"
+  - Intelligent truncation at sentence boundaries
+- **Status**: ✅ DEPLOYED and tested successfully
+
+### **Quality Improvements**
+- **Content Relevance**: Summaries now focus on actual municipal decisions and topics
+- **User Experience**: More informative previews in acta listings
+- **Maintenance**: Algorithm remains simple and maintainable without external dependencies
+
+---
+
+## 🎯 Next Session Recommendations
+
+### **Primary Focus: Content Quality Validation**
+1. **Test New Algorithm**: Upload various PDF formats to validate summary extraction
+2. **User Feedback**: Monitor summary quality with real municipal documents
+3. **Fine-tuning**: Adjust regex patterns based on actual content patterns
+
+### **Secondary Enhancements (Optional)**
+1. **Visual Formatting**: Consider formatting different content types in summaries
+2. **Search Integration**: Leverage improved summaries for better search results
+3. **Batch Processing**: Option to regenerate summaries for existing documents
+
+---
+
+*Session completed successfully. All major objectives achieved: refactorization complete, environment issues resolved, and summary generation significantly enhanced.*

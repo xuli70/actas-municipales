@@ -44,14 +44,14 @@ window.ActasManager = {
     renderActasList(actas) {
         return '<div class="actas-list">' + 
             actas.map(acta => `
-                <div class="acta-item">
+                <div class="acta-item" data-acta-id="${acta.id}">
                     <div class="acta-main" onclick="openPDF('${acta.archivo_url}')">
                         <div class="acta-filename">${acta.archivo_nombre || 'Documento sin nombre'}</div>
                         <div class="acta-summary">${acta.resumen_automatico || 'Resumen no disponible aún'}</div>
                         <div class="acta-status">${this.getStatusBadge(acta.estado_procesamiento || 'pendiente')}</div>
                     </div>
                     <div class="acta-actions">
-                        <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
+                        <button class="btn-ai-query" onclick="openAIModal('${acta.id}', '${acta.titulo || acta.archivo_nombre}', '${acta.archivo_url}', '${acta.resumen_automatico || ''}')">
                             &#129302; Consultar IA
                         </button>
                         ${userRole === 'admin' ? `

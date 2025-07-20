@@ -21,9 +21,19 @@ window.AIHistory = {
             const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
             
             if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-                console.error('Configuración de Supabase no disponible');
+                console.error('Configuración de Supabase no disponible:', {
+                    SUPABASE_URL,
+                    SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA',
+                    window_APP_CONFIG: typeof window.APP_CONFIG,
+                    hostname: window.location.hostname
+                });
                 return;
             }
+            
+            console.log('🚀 AIHistory.save - usando configuración:', {
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA'
+            });
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/consultas_ia`, {
                 method: 'POST',
@@ -58,23 +68,57 @@ window.AIHistory = {
             const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
             
             if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-                console.error('Configuración de Supabase no disponible');
+                console.error('Configuración de Supabase no disponible:', {
+                    SUPABASE_URL,
+                    SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA',
+                    window_APP_CONFIG: typeof window.APP_CONFIG,
+                    hostname: window.location.hostname
+                });
                 return;
             }
             
-            const response = await fetch(
-                `${SUPABASE_URL}/rest/v1/consultas_ia?acta_id=eq.${actaId}&order=created_at.desc&limit=5`, 
-                {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
+            console.log('🚀 AIHistory.load - usando configuración:', {
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA'
+            });
+            
+            const url = `${SUPABASE_URL}/rest/v1/consultas_ia?acta_id=eq.${actaId}&order=created_at.desc&limit=5`;
+            console.log('🚀 AIHistory.load - haciendo fetch a:', url);
+            
+            const response = await fetch(url, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                 }
-            );
+            });
+            
+            console.log('🚀 AIHistory.load - respuesta:', {
+                status: response.status,
+                statusText: response.statusText,
+                url: response.url,
+                headers: Object.fromEntries(response.headers.entries())
+            });
             
             if (response.ok) {
-                const history = await response.json();
-                this.render(history);
+                const responseText = await response.text();
+                console.log('🚀 AIHistory.load - respuesta cruda:', responseText.substring(0, 200));
+                
+                try {
+                    const history = JSON.parse(responseText);
+                    this.render(history);
+                } catch (parseError) {
+                    console.error('❌ AIHistory.load - Error parseando JSON:', {
+                        error: parseError.message,
+                        responseText: responseText.substring(0, 500)
+                    });
+                }
+            } else {
+                const errorText = await response.text();
+                console.error('❌ AIHistory.load - Error HTTP:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    errorText: errorText.substring(0, 500)
+                });
             }
         } catch (error) {
             console.error('Error al cargar historial:', error);

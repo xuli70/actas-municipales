@@ -35,10 +35,13 @@ window.AIManager = {
         }
         
         try {
-            // Obtener configuración
-            const config = window.AppConfig || {};
-            const SUPABASE_URL = config.SUPABASE_URL || window.SUPABASE_URL;
-            const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY;
+            // Obtener configuración de las variables globales que se cargan en index.html
+            const SUPABASE_URL = window.SUPABASE_URL;
+            const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+            
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                throw new Error('Configuración de Supabase no disponible');
+            }
             
             // Obtener el texto extraído del acta
             let textoActa = await this.getActaText(actaId, SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -135,8 +138,8 @@ window.AIManager = {
      * Simula una respuesta de IA o usa IA real si está configurada
      */
     async simulateAIResponse(query, textoActa) {
-        const config = window.AppConfig || {};
-        const OPENAI_API_KEY = config.OPENAI_API_KEY || window.OPENAI_API_KEY;
+        // Obtener configuración de las variables globales
+        const OPENAI_API_KEY = window.OPENAI_API_KEY;
         
         // Si hay API key configurada, usar IA real
         if (OPENAI_API_KEY && window.AI_FUNCTIONS?.callOpenAI) {

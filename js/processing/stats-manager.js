@@ -18,10 +18,13 @@ window.StatsManager = {
         const statsDiv = document.getElementById('processingStats');
         
         try {
-            // Obtener configuración
-            const config = window.AppConfig || {};
-            const SUPABASE_URL = config.SUPABASE_URL || window.SUPABASE_URL;
-            const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY;
+            // Obtener configuración de las variables globales que se cargan en index.html
+            const SUPABASE_URL = window.SUPABASE_URL;
+            const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+            
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                throw new Error('Configuración de Supabase no disponible');
+            }
             
             // Obtener estadísticas directamente de la tabla
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?select=estado_procesamiento`, {

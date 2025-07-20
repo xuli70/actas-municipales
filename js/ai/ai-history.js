@@ -16,9 +16,14 @@ window.AIHistory = {
      */
     async save(actaId, question, answer) {
         try {
-            const config = window.AppConfig || {};
-            const SUPABASE_URL = config.SUPABASE_URL || window.SUPABASE_URL;
-            const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY;
+            // Obtener configuración de las variables globales que se cargan en index.html
+            const SUPABASE_URL = window.SUPABASE_URL;
+            const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+            
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                console.error('Configuración de Supabase no disponible');
+                return;
+            }
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/consultas_ia`, {
                 method: 'POST',
@@ -48,9 +53,14 @@ window.AIHistory = {
      */
     async load(actaId) {
         try {
-            const config = window.AppConfig || {};
-            const SUPABASE_URL = config.SUPABASE_URL || window.SUPABASE_URL;
-            const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY;
+            // Obtener configuración de las variables globales que se cargan en index.html
+            const SUPABASE_URL = window.SUPABASE_URL;
+            const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+            
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                console.error('Configuración de Supabase no disponible');
+                return;
+            }
             
             const response = await fetch(
                 `${SUPABASE_URL}/rest/v1/consultas_ia?acta_id=eq.${actaId}&order=created_at.desc&limit=5`, 

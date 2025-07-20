@@ -313,7 +313,15 @@
                 if (window.AppConfig) {
                     const config = window.AppConfig.load();
                     
-                    // Establecer variables globales
+                    // Establecer variables globales en window para acceso desde módulos
+                    window.SUPABASE_URL = config.SUPABASE_URL;
+                    window.SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+                    window.PASSWORD_USER = config.PASSWORD_USER;
+                    window.PASSWORD_ADMIN = config.PASSWORD_ADMIN;
+                    window.OPENAI_API_KEY = config.OPENAI_API_KEY;
+                    window.AI_MODEL = config.AI_MODEL;
+                    
+                    // Compatibilidad con variables locales
                     SUPABASE_URL = config.SUPABASE_URL;
                     SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
                     PASSWORD_USER = config.PASSWORD_USER;
@@ -322,18 +330,33 @@
                     AI_MODEL = config.AI_MODEL;
                 } else {
                     // Fallback a configuraci&oacute;n b&aacute;sica
-                    SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
-                    SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
-                    PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || 'usuario123';
-                    PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || 'admin123';
-                    OPENAI_API_KEY = window.APP_CONFIG?.OPENAI_API_KEY || '';
-                    AI_MODEL = window.APP_CONFIG?.AI_MODEL || 'gpt-4o-mini';
+                    window.SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
+                    window.SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
+                    window.PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || 'usuario123';
+                    window.PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || 'admin123';
+                    window.OPENAI_API_KEY = window.APP_CONFIG?.OPENAI_API_KEY || '';
+                    window.AI_MODEL = window.APP_CONFIG?.AI_MODEL || 'gpt-4o-mini';
+                    
+                    // Compatibilidad con variables locales
+                    SUPABASE_URL = window.SUPABASE_URL;
+                    SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+                    PASSWORD_USER = window.PASSWORD_USER;
+                    PASSWORD_ADMIN = window.PASSWORD_ADMIN;
+                    OPENAI_API_KEY = window.OPENAI_API_KEY;
+                    AI_MODEL = window.AI_MODEL;
                 }
                 
                 // Verificar configuraci&oacute;n cr&iacute;tica
-                if (!SUPABASE_ANON_KEY) {
+                if (!window.SUPABASE_ANON_KEY) {
                     console.warn('⚠️ SUPABASE_ANON_KEY no configurada');
                 }
+                
+                // Debug: mostrar configuraci&oacute;n cargada
+                console.log('🚀 Variables globales cargadas:', {
+                    SUPABASE_URL: window.SUPABASE_URL,
+                    SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA',
+                    window_available: typeof window !== 'undefined'
+                });
                 
                 // Inicializar m&oacute;dulos
                 if (window.Auth) window.Auth.initialize();

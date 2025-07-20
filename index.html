@@ -200,6 +200,11 @@
     <script src="js/upload/file-manager.js"></script>
     <script src="js/upload/upload-manager.js"></script>
     
+    <!-- M&oacute;dulos de IA -->
+    <script src="js/ai/ai-modal.js"></script>
+    <script src="js/ai/ai-history.js"></script>
+    <script src="js/ai/ai-manager.js"></script>
+    
     <!-- JavaScript -->
     <script>
         // Configuraci&oacute;n desde m&uacute;ltiples fuentes
@@ -294,245 +299,7 @@
             }
         }
         
-        // Variables globales para el modal de IA
-        let currentActaId = null;
-        let currentActaUrl = null;
-        
-        // Funciones del modal de IA
-        function openAIModal(actaId, title, url, summary) {
-            currentActaId = actaId;
-            currentActaUrl = url;
-            
-            document.getElementById('modalActaTitle').textContent = `Consultar IA: ${title}`;
-            document.getElementById('actaSummary').innerHTML = summary ? 
-                `<div class="summary-content"><strong>Resumen:</strong> ${summary}</div>` : 
-                '<div class="summary-content"><em>Resumen no disponible aún</em></div>';
-            
-            document.getElementById('aiQuery').value = '';
-            document.getElementById('aiResponse').style.display = 'none';
-            document.getElementById('aiQueryModal').style.display = 'flex';
-            
-            // Cargar historial de consultas
-            loadQueryHistory(actaId);
-        }
-        
-        function closeAIModal() {
-            document.getElementById('aiQueryModal').style.display = 'none';
-            currentActaId = null;
-            currentActaUrl = null;
-        }
-        
-        // Función para consultar a la IA
-        async function askAI() {
-            const query = document.getElementById('aiQuery').value.trim();
-            const responseDiv = document.getElementById('aiResponse');
-            const responseText = document.getElementById('aiResponseText');
-            const askBtn = document.getElementById('askAIBtn');
-            
-            if (!query) {
-                alert('Por favor ingrese una pregunta');
-                return;
-            }
-            
-            if (!currentActaId) {
-                alert('Error: No hay acta seleccionada');
-                return;
-            }
-            
-            // Deshabilitar botón y mostrar loading
-            askBtn.disabled = true;
-            askBtn.textContent = '🤔 Pensando...';
-            responseDiv.style.display = 'block';
-            responseText.innerHTML = '<div class="loading">La IA está analizando el acta...</div>';
-            
-            try {
-                // Obtener el texto extraído del acta
-                let textoActa = '';
-                try {
-                    const actaResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${currentActaId}&select=texto_extraido,titulo,archivo_url`, {
-                        headers: {
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                        }
-                    });
-                    
-                    if (actaResponse.ok) {
-                        const actaData = await actaResponse.json();
-                        if (actaData.length > 0) {
-                            textoActa = actaData[0].texto_extraido || '';
-                            
-                            // Si no hay texto extraído, intentar extraerlo del PDF
-                            if (!textoActa && actaData[0].archivo_url && window.PDFTextExtractor && window.PDFTextExtractor.isPdfJsLoaded()) {
-                                try {
-                                    responseText.innerHTML = '<div class="loading">Extrayendo texto del PDF...</div>';
-                                    window.PDFTextExtractor.configurePdfJs();
-                                    textoActa = await window.PDFTextExtractor.extractTextFromUrl(actaData[0].archivo_url);
-                                    
-                                    // Actualizar el texto en la base de datos para futuras consultas
-                                    await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${currentActaId}`, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'apikey': SUPABASE_ANON_KEY,
-                                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            texto_extraido: textoActa,
-                                            estado_procesamiento: 'completado'
-                                        })
-                                    });
-                                } catch (extractError) {
-                                    console.error('Error extrayendo texto del PDF:', extractError);
-                                }
-                            }
-                        }
-                    }
-                } catch (fetchError) {
-                    console.error('Error obteniendo datos del acta:', fetchError);
-                }
-                
-                // Generar respuesta de IA
-                const simulatedResponse = await simulateAIResponse(query, textoActa);
-                
-                responseText.innerHTML = `<div class="ai-answer">${simulatedResponse}</div>`;
-                
-                // Guardar consulta en base de datos
-                await saveQuery(currentActaId, query, simulatedResponse);
-                
-                // Recargar historial
-                loadQueryHistory(currentActaId);
-                
-                // Limpiar campo de pregunta
-                document.getElementById('aiQuery').value = '';
-                
-            } catch (error) {
-                responseText.innerHTML = `<div class="error">Error al consultar la IA: ${error.message}</div>`;
-            } finally {
-                askBtn.disabled = false;
-                askBtn.innerHTML = '🤖 Preguntar a la IA';
-            }
-        }
-        
-        // Respuesta de IA (simulada o real según configuración)
-        async function simulateAIResponse(query, textoActa) {
-            // Si hay API key configurada, usar IA real
-            if (OPENAI_API_KEY && window.AI_FUNCTIONS?.callOpenAI) {
-                try {
-                    console.log('Usando IA real con OpenAI');
-                    // Si hay texto extraído, usarlo; si no, indicar que no hay contenido
-                    const contexto = textoActa || 'No se pudo extraer el contenido del PDF. Por favor, revise el archivo directamente.';
-                    return await window.AI_FUNCTIONS.callOpenAI(query, contexto);
-                } catch (error) {
-                    console.error('Error con IA real, usando simulación:', error);
-                    // Continuar con simulación si falla IA real
-                }
-            }
-            
-            // Simular delay de API
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Si hay texto extraído, intentar responder basado en él
-            if (textoActa) {
-                const queryLower = query.toLowerCase();
-                const textoLower = textoActa.toLowerCase();
-                
-                // Buscar información relevante en el texto
-                let respuesta = 'Basándome en el contenido del acta:\n\n';
-                
-                // Buscar fragmentos relevantes (máximo 3 líneas alrededor de la palabra clave)
-                const palabrasClave = query.split(' ').filter(p => p.length > 3);
-                let fragmentosRelevantes = [];
-                
-                for (const palabra of palabrasClave) {
-                    const indice = textoLower.indexOf(palabra.toLowerCase());
-                    if (indice !== -1) {
-                        // Extraer contexto alrededor de la palabra encontrada
-                        const inicio = Math.max(0, indice - 200);
-                        const fin = Math.min(textoActa.length, indice + 200);
-                        let fragmento = textoActa.substring(inicio, fin).trim();
-                        
-                        // Añadir puntos suspensivos si no es el inicio/fin
-                        if (inicio > 0) fragmento = '...' + fragmento;
-                        if (fin < textoActa.length) fragmento = fragmento + '...';
-                        
-                        fragmentosRelevantes.push(fragmento);
-                    }
-                }
-                
-                if (fragmentosRelevantes.length > 0) {
-                    respuesta += 'He encontrado la siguiente información relevante:\n\n';
-                    respuesta += fragmentosRelevantes.slice(0, 3).join('\n\n');
-                } else {
-                    respuesta += 'No he encontrado información específica sobre "' + query + '" en el acta. ';
-                    respuesta += 'El documento contiene ' + textoActa.length + ' caracteres de contenido. ';
-                    respuesta += 'Por favor, reformule su pregunta o consulte el PDF directamente.';
-                }
-                
-                return respuesta;
-            }
-            
-            // Si no hay texto extraído, usar respuestas genéricas
-            return 'No se pudo extraer el contenido del PDF para responder su consulta. Por favor, consulte el documento directamente haciendo clic en "Ver PDF".';
-        }
-        
-        // Guardar consulta en base de datos
-        async function saveQuery(actaId, question, answer) {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/consultas_ia`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        acta_id: actaId,
-                        pregunta: question,
-                        respuesta: answer,
-                        created_by: userRole || 'usuario'
-                    })
-                });
-                
-                if (!response.ok) {
-                    console.error('Error al guardar consulta:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error al guardar consulta:', error);
-            }
-        }
-        
-        // Cargar historial de consultas
-        async function loadQueryHistory(actaId) {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/consultas_ia?acta_id=eq.${actaId}&order=created_at.desc&limit=5`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const history = await response.json();
-                    const historyDiv = document.getElementById('queryHistory');
-                    const historyList = document.getElementById('historyList');
-                    
-                    if (history.length > 0) {
-                        historyDiv.style.display = 'block';
-                        historyList.innerHTML = history.map(item => `
-                            <div class="history-item">
-                                <div class="history-question"><strong>P:</strong> ${item.pregunta}</div>
-                                <div class="history-answer"><strong>R:</strong> ${item.respuesta}</div>
-                                <div class="history-date">${new Date(item.created_at).toLocaleString('es-ES')}</div>
-                            </div>
-                        `).join('');
-                    } else {
-                        historyDiv.style.display = 'none';
-                    }
-                }
-            } catch (error) {
-                console.error('Error al cargar historial:', error);
-            }
-        }
+        // Sistema AI gestionado por módulos ai-modal.js, ai-manager.js, ai-history.js
         
         // Función para cargar estadísticas de procesamiento
         async function loadProcessingStats() {
@@ -670,6 +437,9 @@
                 if (window.DeleteManager) window.DeleteManager.initialize();
                 if (window.FileManager) window.FileManager.initialize();
                 if (window.UploadManager) window.UploadManager.initialize();
+                if (window.AIModal) window.AIModal.initialize();
+                if (window.AIHistory) window.AIHistory.initialize();
+                if (window.AIManager) window.AIManager.initialize();
                 
                 console.log('✅ Aplicaci&oacute;n inicializada correctamente');
             } catch (error) {

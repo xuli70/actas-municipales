@@ -205,6 +205,10 @@
     <script src="js/ai/ai-history.js"></script>
     <script src="js/ai/ai-manager.js"></script>
     
+    <!-- M&oacute;dulos de Procesamiento -->
+    <script src="js/processing/stats-manager.js"></script>
+    <script src="js/processing/batch-processor.js"></script>
+    
     <!-- JavaScript -->
     <script>
         // Configuraci&oacute;n desde m&uacute;ltiples fuentes
@@ -300,105 +304,7 @@
         }
         
         // Sistema AI gestionado por módulos ai-modal.js, ai-manager.js, ai-history.js
-        
-        // Función para cargar estadísticas de procesamiento
-        async function loadProcessingStats() {
-            const statsDiv = document.getElementById('processingStats');
-            
-            try {
-                // Obtener estadísticas directamente de la tabla
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?select=estado_procesamiento`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const actas = await response.json();
-                    
-                    // Calcular estadísticas
-                    const stats = {
-                        completados: actas.filter(a => a.estado_procesamiento === 'completado').length,
-                        pendientes: actas.filter(a => a.estado_procesamiento === 'pendiente').length,
-                        procesando: actas.filter(a => a.estado_procesamiento === 'procesando').length,
-                        con_error: actas.filter(a => a.estado_procesamiento === 'error').length,
-                        total: actas.length
-                    };
-                    
-                    stats.porcentaje_completado = stats.total > 0 ? 
-                        Math.round((stats.completados / stats.total) * 100) : 0;
-                    
-                    statsDiv.innerHTML = `
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                            <div><strong>Total de actas:</strong> ${stats.total}</div>
-                            <div><strong>Completados:</strong> <span style="color: #27ae60;">${stats.completados}</span></div>
-                            <div><strong>Pendientes:</strong> <span style="color: #e67e22;">${stats.pendientes}</span></div>
-                            <div><strong>Con error:</strong> <span style="color: #e74c3c;">${stats.con_error}</span></div>
-                        </div>
-                        <div style="margin-top: 15px;">
-                            <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
-                                <div style="background: #27ae60; height: 100%; width: ${stats.porcentaje_completado}%; transition: width 0.3s;"></div>
-                            </div>
-                            <div style="text-align: center; margin-top: 5px; font-weight: bold;">
-                                ${stats.porcentaje_completado}% Completado
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    statsDiv.innerHTML = '<p style="color: #e74c3c;">Error al cargar estadísticas</p>';
-                }
-            } catch (error) {
-                console.error('Error cargando estadísticas:', error);
-                statsDiv.innerHTML = '<p style="color: #e74c3c;">Error al cargar estadísticas</p>';
-            }
-        }
-        
-        // Función para procesar PDFs pendientes
-        async function processPendingPDFs() {
-            const processBtn = document.getElementById('processBtn');
-            const messageDiv = document.getElementById('processingMessage');
-            
-            if (!window.PDFTextExtractor || !window.PDFTextExtractor.isPdfJsLoaded()) {
-                messageDiv.innerHTML = '<div class="error">Error: PDF.js no está cargado correctamente</div>';
-                return;
-            }
-            
-            if (!window.PDFBatchProcessor) {
-                messageDiv.innerHTML = '<div class="error">Error: Módulo de procesamiento no disponible</div>';
-                return;
-            }
-            
-            // Configurar PDF.js
-            window.PDFTextExtractor.configurePdfJs();
-            
-            // Deshabilitar botón
-            processBtn.disabled = true;
-            processBtn.innerHTML = '⌛ Procesando...';
-            messageDiv.innerHTML = '<div class="loading">Iniciando procesamiento de PDFs pendientes...</div>';
-            
-            try {
-                const resultado = await window.PDFBatchProcessor.processAllPending();
-                
-                messageDiv.innerHTML = `
-                    <div class="success">
-                        ✅ Procesamiento completado<br>
-                        Procesados: ${resultado.procesados}<br>
-                        Errores: ${resultado.errores}<br>
-                        Total: ${resultado.total}
-                    </div>
-                `;
-                
-                // Recargar estadísticas
-                await loadProcessingStats();
-                
-            } catch (error) {
-                messageDiv.innerHTML = `<div class="error">Error durante el procesamiento: ${error.message}</div>`;
-            } finally {
-                processBtn.disabled = false;
-                processBtn.innerHTML = '🤖 Procesar PDFs Pendientes';
-            }
-        }
+        // Sistema de procesamiento gestionado por módulos stats-manager.js, batch-processor.js
         
         // Inicializaci&oacute;n de m&oacute;dulos
         document.addEventListener('DOMContentLoaded', function() {
@@ -440,6 +346,8 @@
                 if (window.AIModal) window.AIModal.initialize();
                 if (window.AIHistory) window.AIHistory.initialize();
                 if (window.AIManager) window.AIManager.initialize();
+                if (window.StatsManager) window.StatsManager.initialize();
+                if (window.BatchProcessor) window.BatchProcessor.initialize();
                 
                 console.log('✅ Aplicaci&oacute;n inicializada correctamente');
             } catch (error) {

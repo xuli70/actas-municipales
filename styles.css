@@ -393,6 +393,11 @@ label {
     animation: pulse 2s infinite;
 }
 
+/* Padding reducido específicamente para #actasList con clase loading */
+#actasList.loading {
+    padding: var(--spacing-xl);
+}
+
 @keyframes pulse {
     0%, 100% { opacity: 0.8; }
     50% { opacity: 1; }

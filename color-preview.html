@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Previa de Colores - Actas Municipales</title>
+    <style id="mainStyles">
+        /* Variables CSS principales */
+        :root {
+            /* Colores originales */
+            --color-primary: #1e293b;
+            --color-primary-light: #334155;
+            --color-primary-dark: #0f172a;
+            
+            --color-primary-text: #0f172a;
+            --color-primary-medium: #475569;
+            
+            --color-secondary: #059669;
+            --color-secondary-light: #10b981;
+            --color-secondary-dark: #047857;
+            
+            --color-accent: #dc2626;
+            --color-accent-light: #ef4444;
+            --color-accent-dark: #991b1b;
+            
+            --color-text-primary: #0f172a;
+            --color-text-secondary: #1e293b;
+            --color-text-muted: #475569;
+            --color-text-light: #64748b;
+            
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f9fafb;
+            --color-bg-accent: #f3f4f6;
+            
+            --color-border: #d1d5db;
+            --color-border-dark: #9ca3af;
+            
+            /* Sombras */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+            
+            /* Espaciado */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            /* Tipografía */
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            
+            /* Bordes redondeados */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+        
+        /* Reset y estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 18px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+            font-size: var(--font-size-lg);
+            line-height: 1.7;
+            color: var(--color-text-primary);
+            background-color: var(--color-bg-secondary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Layout principal */
+        .main-layout {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Panel de control */
+        .control-panel {
+            width: 350px;
+            background: #f8f9fa;
+            border-right: 2px solid #e9ecef;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .control-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        
+        .color-group {
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .color-group h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .color-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+        
+        .color-control label {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .color-control input[type="color"] {
+            width: 50px;
+            height: 35px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .color-control .color-value {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #495057;
+            min-width: 80px;
+            text-align: center;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        
+        /* Vista previa */
+        .preview-area {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--color-bg-secondary);
+        }
+        
+        /* Controles de vista */
+        .view-controls {
+            background: white;
+            padding: 15px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .view-btn {
+            padding: 8px 20px;
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .view-btn:hover:not(.active) {
+            background: #dee2e6;
+        }
+        
+        /* Botones de acción */
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .action-btn.primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background: #0056b3;
+        }
+        
+        .action-btn.secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #5a6268;
+        }
+        
+        .action-btn.success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .action-btn.success:hover {
+            background: #218838;
+        }
+        
+        /* Contenedor principal copiado de styles.css */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%);
+            color: white;
+            padding: var(--spacing-2xl) var(--spacing-md);
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            background-size: 20px 20px;
+            opacity: 0.3;
+        }
+        
+        h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: -0.025em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: var(--font-size-xl);
+            opacity: 0.95;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Menú principal */
+        .main-menu {
+            text-align: center;
+            padding: var(--spacing-2xl) var(--spacing-md);
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            margin: var(--spacing-xl) 0;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .menu-title {
+            font-size: var(--font-size-2xl);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xl);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+        
+        /* Botones */
+        .btn {
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            margin: var(--spacing-md) auto;
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.025em;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .btn:hover::before {
+            transform: translateX(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-light) 100%);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--color-secondary-dark) 0%, var(--color-secondary) 100%);
+        }
+        
+        /* Sección de administración */
+        .admin-section {
+            background: var(--color-bg-primary);
+            padding: var(--spacing-2xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin: var(--spacing-xl) 0;
+            border: 1px solid var(--color-border);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        label {
+            display: block;
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: 0.025em;
+        }
+        
+        .file-input {
+            width: 100%;
+            padding: var(--spacing-lg);
+            font-size: var(--font-size-lg);
+            border: 3px dashed var(--color-primary);
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+        
+        .file-input:hover {
+            border-color: var(--color-primary-dark);
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Lista de actas */
+        .actas-list {
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin: var(--spacing-xl) 0;
+            border: 1px solid var(--color-border);
+        }
+        
+        .acta-item {
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--color-border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: var(--color-bg-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .acta-item:last-child {
+            border-bottom: none;
+        }
+        
+        .acta-item:hover {
+            background: var(--color-bg-accent);
+            box-shadow: inset 4px 0 0 var(--color-primary);
+        }
+        
+        .acta-main {
+            flex: 1;
+        }
+        
+        .acta-filename {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.4;
+        }
+        
+        .acta-summary {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-sm);
+            font-style: italic;
+        }
+        
+        .acta-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-shrink: 0;
+        }
+        
+        .btn-ai-query {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap;
+        }
+        
+        .btn-ai-query:hover {
+            background: linear-gradient(135deg, #6d28d9 0%, #9333ea 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-delete {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            white-space: nowrap;
+            margin-left: var(--spacing-sm);
+        }
+        
+        .btn-delete:hover {
+            background: var(--color-accent-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* Toast de notificación */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-layout">
+        <!-- Panel de Control -->
+        <div class="control-panel">
+            <h2>Panel de Control de Colores</h2>
+            
+            <!-- Colores de Fondo -->
+            <div class="color-group">
+                <h3>Colores de Fondo</h3>
+                <div class="color-control">
+                    <label>Fondo Principal</label>
+                    <input type="color" id="bg-primary" value="#ffffff" data-var="--color-bg-primary">
+                    <span class="color-value">#ffffff</span>
+                </div>
+                <div class="color-control">
+                    <label>Fondo Secundario</label>
+                    <input type="color" id="bg-secondary" value="#f9fafb" data-var="--color-bg-secondary">
+                    <span class="color-value">#f9fafb</span>
+                </div>
+                <div class="color-control">
+                    <label>Fondo Acento</label>
+                    <input type="color" id="bg-accent" value="#f3f4f6" data-var="--color-bg-accent">
+                    <span class="color-value">#f3f4f6</span>
+                </div>
+            </div>
+            
+            <!-- Colores Primarios -->
+            <div class="color-group">
+                <h3>Colores Primarios</h3>
+                <div class="color-control">
+                    <label>Primario</label>
+                    <input type="color" id="primary" value="#1e293b" data-var="--color-primary">
+                    <span class="color-value">#1e293b</span>
+                </div>
+                <div class="color-control">
+                    <label>Primario Claro</label>
+                    <input type="color" id="primary-light" value="#334155" data-var="--color-primary-light">
+                    <span class="color-value">#334155</span>
+                </div>
+                <div class="color-control">
+                    <label>Primario Oscuro</label>
+                    <input type="color" id="primary-dark" value="#0f172a" data-var="--color-primary-dark">
+                    <span class="color-value">#0f172a</span>
+                </div>
+            </div>
+            
+            <!-- Colores de Texto -->
+            <div class="color-group">
+                <h3>Colores de Texto</h3>
+                <div class="color-control">
+                    <label>Texto Principal</label>
+                    <input type="color" id="text-primary" value="#0f172a" data-var="--color-text-primary">
+                    <span class="color-value">#0f172a</span>
+                </div>
+                <div class="color-control">
+                    <label>Texto Secundario</label>
+                    <input type="color" id="text-secondary" value="#1e293b" data-var="--color-text-secondary">
+                    <span class="color-value">#1e293b</span>
+                </div>
+                <div class="color-control">
+                    <label>Texto Atenuado</label>
+                    <input type="color" id="text-muted" value="#475569" data-var="--color-text-muted">
+                    <span class="color-value">#475569</span>
+                </div>
+            </div>
+            
+            <!-- Botones de Acción -->
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="applyLightTheme()">Aplicar Tema Claro</button>
+                <button class="action-btn secondary" onclick="resetColors()">Restaurar Original</button>
+                <button class="action-btn success" onclick="exportCSS()">Exportar CSS</button>
+            </div>
+        </div>
+        
+        <!-- Área de Vista Previa -->
+        <div class="preview-area">
+            <!-- Controles de Vista -->
+            <div class="view-controls">
+                <button class="view-btn active" onclick="showView('user')">Vista Usuario</button>
+                <button class="view-btn" onclick="showView('admin')">Vista Administrador</button>
+            </div>
+            
+            <!-- Contenedor Principal -->
+            <div class="container">
+                <!-- Header -->
+                <header>
+                    <h1>Actas Municipales de Valdefuentes</h1>
+                    <p class="subtitle">Sistema de Gestión Digital</p>
+                </header>
+                
+                <!-- Vista de Usuario -->
+                <div id="userView" class="view-content">
+                    <div class="main-menu">
+                        <h2 class="menu-title">Menú Principal</h2>
+                        <button class="btn">
+                            <span class="btn-icon">📄</span> Ver Actas
+                        </button>
+                        <button class="btn btn-secondary">
+                            <span class="btn-icon">🔍</span> Buscar Actas
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Vista de Administrador -->
+                <div id="adminView" class="view-content" style="display:none;">
+                    <div class="admin-section">
+                        <h2 class="menu-title">Panel de Administración</h2>
+                        
+                        <div class="form-group">
+                            <label for="pdfFile">Seleccionar archivos PDF:</label>
+                            <input type="file" id="pdfFile" class="file-input" accept=".pdf" multiple>
+                        </div>
+                        
+                        <button class="btn">
+                            <span class="btn-icon">📤</span> Subir Actas
+                        </button>
+                    </div>
+                    
+                    <div class="actas-list">
+                        <div class="acta-item">
+                            <div class="acta-main">
+                                <div class="acta-filename">Acta_2024_01_15.pdf</div>
+                                <div class="acta-summary">Sesión ordinaria del pleno municipal. Aprobación de presupuestos 2024 y plan de obras públicas...</div>
+                            </div>
+                            <div class="acta-actions">
+                                <button class="btn-ai-query">🤖 Consultar IA</button>
+                                <button class="btn-delete">🗑️ Eliminar</button>
+                            </div>
+                        </div>
+                        <div class="acta-item">
+                            <div class="acta-main">
+                                <div class="acta-filename">Acta_2023_12_20.pdf</div>
+                                <div class="acta-summary">Sesión extraordinaria. Discusión sobre festividades navideñas y actividades culturales...</div>
+                            </div>
+                            <div class="acta-actions">
+                                <button class="btn-ai-query">🤖 Consultar IA</button>
+                                <button class="btn-delete">🗑️ Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast de notificación -->
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        // Configuración de colores originales
+        const originalColors = {
+            '--color-bg-primary': '#ffffff',
+            '--color-bg-secondary': '#f9fafb',
+            '--color-bg-accent': '#f3f4f6',
+            '--color-primary': '#1e293b',
+            '--color-primary-light': '#334155',
+            '--color-primary-dark': '#0f172a',
+            '--color-text-primary': '#0f172a',
+            '--color-text-secondary': '#1e293b',
+            '--color-text-muted': '#475569'
+        };
+        
+        // Configuración de tema claro
+        const lightTheme = {
+            '--color-bg-primary': '#fafafa',
+            '--color-bg-secondary': '#fcfcfd',
+            '--color-bg-accent': '#f7f8f9',
+            '--color-primary': '#e8ecf2',
+            '--color-primary-light': '#f0f3f7',
+            '--color-primary-dark': '#dce3ed',
+            '--color-text-primary': '#0f172a',
+            '--color-text-secondary': '#1e293b',
+            '--color-text-muted': '#475569'
+        };
+        
+        // Inicializar event listeners
+        document.querySelectorAll('input[type="color"]').forEach(input => {
+            input.addEventListener('input', function(e) {
+                updateColor(this.dataset.var, this.value);
+                updateColorValue(this);
+            });
+        });
+        
+        // Actualizar color en tiempo real
+        function updateColor(varName, value) {
+            document.documentElement.style.setProperty(varName, value);
+            
+            // Si es un color primario, actualizar también el texto del header
+            if (varName === '--color-primary' || varName === '--color-primary-light' || varName === '--color-primary-dark') {
+                updateHeaderTextColor();
+            }
+        }
+        
+        // Actualizar el valor hexadecimal mostrado
+        function updateColorValue(input) {
+            const valueSpan = input.nextElementSibling;
+            valueSpan.textContent = input.value;
+        }
+        
+        // Actualizar color de texto del header basado en el contraste
+        function updateHeaderTextColor() {
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
+            const isLight = isColorLight(primaryColor);
+            
+            const header = document.querySelector('header');
+            if (isLight) {
+                header.style.color = 'var(--color-text-primary)';
+                header.querySelectorAll('h1, .subtitle').forEach(el => {
+                    el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                });
+            } else {
+                header.style.color = 'white';
+                header.querySelectorAll('h1, .subtitle').forEach(el => {
+                    el.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+                });
+            }
+        }
+        
+        // Determinar si un color es claro u oscuro
+        function isColorLight(color) {
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return brightness > 155;
+        }
+        
+        // Aplicar tema claro
+        function applyLightTheme() {
+            Object.entries(lightTheme).forEach(([varName, value]) => {
+                updateColor(varName, value);
+                
+                // Actualizar inputs
+                const input = document.querySelector(`input[data-var="${varName}"]`);
+                if (input) {
+                    input.value = value;
+                    updateColorValue(input);
+                }
+            });
+            
+            showToast('Tema claro aplicado');
+        }
+        
+        // Restaurar colores originales
+        function resetColors() {
+            Object.entries(originalColors).forEach(([varName, value]) => {
+                updateColor(varName, value);
+                
+                // Actualizar inputs
+                const input = document.querySelector(`input[data-var="${varName}"]`);
+                if (input) {
+                    input.value = value;
+                    updateColorValue(input);
+                }
+            });
+            
+            showToast('Colores originales restaurados');
+        }
+        
+        // Exportar configuración CSS
+        function exportCSS() {
+            let css = '/* Colores personalizados para Actas Municipales */\n:root {\n';
+            
+            document.querySelectorAll('input[type="color"]').forEach(input => {
+                const varName = input.dataset.var;
+                const value = input.value;
+                css += `    ${varName}: ${value};\n`;
+            });
+            
+            css += '}';
+            
+            // Copiar al portapapeles
+            navigator.clipboard.writeText(css).then(() => {
+                showToast('CSS copiado al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                showToast('Error al copiar CSS');
+            });
+        }
+        
+        // Cambiar entre vistas
+        function showView(view) {
+            // Actualizar botones
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Mostrar/ocultar vistas
+            if (view === 'user') {
+                document.getElementById('userView').style.display = 'block';
+                document.getElementById('adminView').style.display = 'none';
+            } else {
+                document.getElementById('userView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+            }
+        }
+        
+        // Mostrar toast de notificación
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Calcular contraste entre dos colores
+        function getContrast(color1, color2) {
+            const rgb1 = hexToRgb(color1);
+            const rgb2 = hexToRgb(color2);
+            
+            const l1 = getLuminance(rgb1);
+            const l2 = getLuminance(rgb2);
+            
+            const contrast = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+            return contrast.toFixed(2);
+        }
+        
+        // Convertir hex a RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+        
+        // Calcular luminancia
+        function getLuminance(rgb) {
+            const rsRGB = rgb.r / 255;
+            const gsRGB = rgb.g / 255;
+            const bsRGB = rgb.b / 255;
+            
+            const r = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4);
+            const g = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4);
+            const b = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4);
+            
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
+    </script>
+</body>
+</html>

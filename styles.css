@@ -7,12 +7,12 @@
    ============================================ */
 :root {
     /* Colores principales - Alto contraste mejorado */
-    --color-primary: #1e293b;          /* Azul slate oscuro - mejor contraste */
-    --color-primary-light: #334155;    /* Azul slate medio */
-    --color-primary-dark: #0f172a;     /* Azul slate muy oscuro */
+    --color-primary: #2e5799;          /* Azul medio con buen contraste */
+    --color-primary-light: #4b5d77;    /* Azul grisáceo */
+    --color-primary-dark: #3d568f;     /* Azul oscuro */
     
     /* Colores de texto mejorados */
-    --color-primary-text: #0f172a;     /* Texto oscuro con máximo contraste */
+    --color-primary-text: #020817;     /* Texto oscuro con máximo contraste */
     --color-primary-medium: #475569;   /* Azul intermedio para elementos secundarios */
     
     --color-secondary: #059669;        /* Verde esmeralda */
@@ -24,14 +24,14 @@
     --color-accent-dark: #991b1b;      /* Rojo oscuro */
     
     /* Colores neutros - Alto contraste mejorado */
-    --color-text-primary: #0f172a;     /* Negro profundo para máximo contraste */
-    --color-text-secondary: #1e293b;   /* Gris muy oscuro */
-    --color-text-muted: #475569;       /* Gris medio con mejor contraste */
+    --color-text-primary: #020817;     /* Negro profundo para máximo contraste */
+    --color-text-secondary: #010813;   /* Negro muy oscuro */
+    --color-text-muted: #120808;       /* Negro medio con mejor contraste */
     --color-text-light: #64748b;       /* Gris claro mejorado */
     
-    --color-bg-primary: #ffffff;       /* Blanco puro */
-    --color-bg-secondary: #f9fafb;     /* Gris muy claro */
-    --color-bg-accent: #f3f4f6;        /* Gris claro */
+    --color-bg-primary: #d7e1e5;       /* Gris azulado claro */
+    --color-bg-secondary: #d0dbe7;     /* Gris azulado muy claro */
+    --color-bg-accent: #e7e8e9;        /* Gris claro */
     
     --color-border: #d1d5db;           /* Borde gris */
     --color-border-dark: #9ca3af;      /* Borde gris oscuro */

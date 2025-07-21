@@ -1,6 +1,6 @@
 /**
  * ai-history.js - Gestión del historial de consultas IA
- * Sistema de Actas Municipales
+ * Sistema de Actas Municipales - Usando sessionStorage para privacidad
  */
 
 window.AIHistory = {
@@ -8,121 +8,93 @@ window.AIHistory = {
      * Inicialización del módulo
      */
     initialize() {
-        console.log('✅ AIHistory inicializado');
+        console.log('✅ AIHistory inicializado (modo sessionStorage)');
     },
     
     /**
-     * Guarda una consulta en la base de datos
+     * Guarda una consulta en sessionStorage (privado por sesión)
      */
     async save(actaId, question, answer) {
         try {
-            // Obtener configuración de las variables globales que se cargan en index.html
-            const SUPABASE_URL = window.SUPABASE_URL;
-            const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+            const queryData = {
+                id: `query_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                acta_id: actaId,
+                pregunta: question,
+                respuesta: answer,
+                created_at: new Date().toISOString(),
+                created_by: window.userRole || 'usuario'
+            };
             
-            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-                console.error('Configuración de Supabase no disponible:', {
-                    SUPABASE_URL,
-                    SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA',
-                    window_APP_CONFIG: typeof window.APP_CONFIG,
-                    hostname: window.location.hostname
-                });
-                return;
+            // Obtener historial existente o crear uno nuevo
+            const existingHistory = this.getSessionHistory();
+            
+            // Agregar nueva consulta al principio
+            existingHistory.single.unshift(queryData);
+            
+            // Mantener solo las últimas 10 consultas
+            if (existingHistory.single.length > 10) {
+                existingHistory.single = existingHistory.single.slice(0, 10);
             }
             
-            console.log('🚀 AIHistory.save - usando configuración:', {
-                SUPABASE_URL,
-                SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA'
+            // Guardar en sessionStorage
+            sessionStorage.setItem('ai_queries_history', JSON.stringify(existingHistory));
+            
+            console.log('💾 Consulta guardada en sessionStorage:', {
+                actaId,
+                questionLength: question.length,
+                answerLength: answer.length
             });
             
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/consultas_ia`, {
-                method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    acta_id: actaId,
-                    pregunta: question,
-                    respuesta: answer,
-                    created_by: window.userRole || 'usuario'
-                })
-            });
-            
-            if (!response.ok) {
-                console.error('Error al guardar consulta:', response.statusText);
-            }
         } catch (error) {
-            console.error('Error al guardar consulta:', error);
+            console.error('Error al guardar consulta en sessionStorage:', error);
         }
     },
     
     /**
-     * Carga el historial de consultas de un acta
+     * Carga el historial de consultas de un acta desde sessionStorage
      */
     async load(actaId) {
         try {
-            // Obtener configuración de las variables globales que se cargan en index.html
-            const SUPABASE_URL = window.SUPABASE_URL;
-            const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+            const history = this.getSessionHistory();
             
-            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-                console.error('Configuración de Supabase no disponible:', {
-                    SUPABASE_URL,
-                    SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA',
-                    window_APP_CONFIG: typeof window.APP_CONFIG,
-                    hostname: window.location.hostname
-                });
-                return;
-            }
+            // Filtrar consultas por acta específica
+            const actaHistory = history.single.filter(item => item.acta_id === actaId);
             
-            console.log('🚀 AIHistory.load - usando configuración:', {
-                SUPABASE_URL,
-                SUPABASE_ANON_KEY: SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA'
-            });
+            console.log(`📚 Cargadas ${actaHistory.length} consultas del historial para acta: ${actaId}`);
             
-            const url = `${SUPABASE_URL}/rest/v1/consultas_ia?acta_id=eq.${actaId}&order=created_at.desc&limit=5`;
-            console.log('🚀 AIHistory.load - haciendo fetch a:', url);
+            this.render(actaHistory);
             
-            const response = await fetch(url, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
-            });
-            
-            console.log('🚀 AIHistory.load - respuesta:', {
-                status: response.status,
-                statusText: response.statusText,
-                url: response.url,
-                headers: Object.fromEntries(response.headers.entries())
-            });
-            
-            if (response.ok) {
-                const responseText = await response.text();
-                console.log('🚀 AIHistory.load - respuesta cruda:', responseText.substring(0, 200));
-                
-                try {
-                    const history = JSON.parse(responseText);
-                    this.render(history);
-                } catch (parseError) {
-                    console.error('❌ AIHistory.load - Error parseando JSON:', {
-                        error: parseError.message,
-                        responseText: responseText.substring(0, 500)
-                    });
-                }
-            } else {
-                const errorText = await response.text();
-                console.error('❌ AIHistory.load - Error HTTP:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    errorText: errorText.substring(0, 500)
-                });
+        } catch (error) {
+            console.error('Error al cargar historial desde sessionStorage:', error);
+        }
+    },
+    
+    /**
+     * Obtiene el historial completo desde sessionStorage
+     */
+    getSessionHistory() {
+        try {
+            const stored = sessionStorage.getItem('ai_queries_history');
+            if (stored) {
+                return JSON.parse(stored);
             }
         } catch (error) {
-            console.error('Error al cargar historial:', error);
+            console.error('Error al leer sessionStorage:', error);
         }
+        
+        // Estructura por defecto
+        return {
+            single: [],
+            multiple: []
+        };
+    },
+    
+    /**
+     * Limpia todo el historial de la sesión
+     */
+    clearSession() {
+        sessionStorage.removeItem('ai_queries_history');
+        console.log('🧹 Historial de consultas limpiado');
     },
     
     /**

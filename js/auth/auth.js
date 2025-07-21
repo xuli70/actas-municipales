@@ -71,6 +71,14 @@ window.Auth = {
         this.state.userRole = null;
         this.state.isAuthenticated = false;
         
+        // Limpiar historial de consultas IA de la sesión
+        if (window.AIHistory && window.AIHistory.clearSession) {
+            window.AIHistory.clearSession();
+        }
+        if (window.MultiHistory && window.MultiHistory.clearSession) {
+            window.MultiHistory.clearSession();
+        }
+        
         document.getElementById('authScreen').style.display = 'block';
         document.getElementById('mainMenu').style.display = 'none';
         document.getElementById('actasSection').style.display = 'none';
@@ -89,7 +97,7 @@ window.Auth = {
             window.currentView = 'auth';
         }
         
-        console.log('✅ Sesión cerrada');
+        console.log('✅ Sesión cerrada y historial de consultas limpiado');
     },
 
     /**

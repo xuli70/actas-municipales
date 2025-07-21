@@ -6,10 +6,14 @@
    Variables CSS para consistencia
    ============================================ */
 :root {
-    /* Colores principales - Alto contraste */
-    --color-primary: #1e3a8a;          /* Azul marino profundo */
-    --color-primary-light: #3b82f6;    /* Azul más claro */
-    --color-primary-dark: #1e293b;     /* Azul muy oscuro */
+    /* Colores principales - Alto contraste mejorado */
+    --color-primary: #1e293b;          /* Azul slate oscuro - mejor contraste */
+    --color-primary-light: #334155;    /* Azul slate medio */
+    --color-primary-dark: #0f172a;     /* Azul slate muy oscuro */
+    
+    /* Colores de texto mejorados */
+    --color-primary-text: #0f172a;     /* Texto oscuro con máximo contraste */
+    --color-primary-medium: #475569;   /* Azul intermedio para elementos secundarios */
     
     --color-secondary: #059669;        /* Verde esmeralda */
     --color-secondary-light: #10b981;  /* Verde claro */
@@ -19,11 +23,11 @@
     --color-accent-light: #ef4444;     /* Rojo claro */
     --color-accent-dark: #991b1b;      /* Rojo oscuro */
     
-    /* Colores neutros - Alto contraste */
-    --color-text-primary: #111827;     /* Negro casi puro */
-    --color-text-secondary: #374151;   /* Gris oscuro */
-    --color-text-muted: #6b7280;       /* Gris medio */
-    --color-text-light: #9ca3af;       /* Gris claro */
+    /* Colores neutros - Alto contraste mejorado */
+    --color-text-primary: #0f172a;     /* Negro profundo para máximo contraste */
+    --color-text-secondary: #1e293b;   /* Gris muy oscuro */
+    --color-text-muted: #475569;       /* Gris medio con mejor contraste */
+    --color-text-light: #64748b;       /* Gris claro mejorado */
     
     --color-bg-primary: #ffffff;       /* Blanco puro */
     --color-bg-secondary: #f9fafb;     /* Gris muy claro */
@@ -274,7 +278,7 @@ h1 {
     top: 50%;
     transform: translateY(-50%);
     font-size: var(--font-size-xl);
-    color: var(--color-primary);
+    color: var(--color-primary-medium);
     opacity: 0;
     transition: all 0.3s ease;
     font-weight: bold;
@@ -680,7 +684,7 @@ label {
 }
 
 .auth-title {
-    color: var(--color-primary);
+    color: var(--color-primary-text);
     font-size: var(--font-size-2xl);
     font-weight: 700;
     margin-bottom: var(--spacing-xl);
@@ -719,7 +723,7 @@ label {
 
 .user-info span {
     font-weight: 600;
-    color: var(--color-primary);
+    color: var(--color-primary-text);
     font-size: var(--font-size-lg);
 }
 
@@ -869,7 +873,7 @@ label {
 
 .search-relevance {
     font-size: var(--font-size-sm);
-    color: var(--color-primary);
+    color: var(--color-primary-medium);
     font-weight: 600;
     margin-top: var(--spacing-sm);
     text-align: center;
@@ -1068,7 +1072,7 @@ label {
 
 .modal-header h3 {
     margin: 0;
-    color: var(--color-primary);
+    color: var(--color-primary-text);
     font-size: var(--font-size-xl);
     font-weight: 700;
 }
@@ -1380,7 +1384,7 @@ label {
 
 .upload-progress h4 {
     margin: 0 0 var(--spacing-lg) 0;
-    color: var(--color-primary);
+    color: var(--color-primary-text);
     font-size: var(--font-size-xl);
     font-weight: 600;
 }
@@ -1598,7 +1602,7 @@ label {
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--radius-md);
     font-size: 14px;
-    color: #1e40af;
+    color: var(--color-primary-text);
     border: 1px solid #bfdbfe;
     font-weight: 500;
 }
@@ -1619,7 +1623,7 @@ label {
 
 .selected-actas-summary h4 {
     margin: 0 0 var(--spacing-md) 0;
-    color: var(--color-primary);
+    color: var(--color-primary-text);
     font-size: 18px;
 }
 

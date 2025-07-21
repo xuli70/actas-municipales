@@ -556,9 +556,17 @@ label {
         margin-bottom: var(--spacing-lg);
     }
     
+    /* Permitir que las actas se extiendan en móviles */
+    #actasSection {
+        overflow-x: visible;
+    }
+    
     /* Ajustes para actas list en móviles */
     .actas-list {
-        margin: var(--spacing-sm) 0;
+        margin: 0;
+        margin-left: calc(-1 * var(--spacing-sm));
+        margin-right: calc(-1 * var(--spacing-sm));
+        width: calc(100% + 2 * var(--spacing-sm));
         border-radius: 0;
         box-shadow: none;
         border-left: none;
@@ -599,6 +607,9 @@ label {
     /* Ajustes adicionales para actas en móviles pequeños */
     .actas-list {
         margin: 0;
+        margin-left: calc(-1 * var(--spacing-xs));
+        margin-right: calc(-1 * var(--spacing-xs));
+        width: calc(100% + 2 * var(--spacing-xs));
         padding: 0;
     }
     

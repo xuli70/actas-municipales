@@ -62,6 +62,13 @@
                 <button class="btn-start-selection" onclick="window.MultiSelector.enterSelectionMode()">
                     ☑️ Seleccionar Actas para Consulta IA
                 </button>
+                <!-- Bot&oacute;n de reordenamiento solo para admin -->
+                <button class="btn-reorder" id="reorderButton" onclick="window.ReorderManager.enterReorderMode()" style="display: none;">
+                    📝 Reordenar Actas
+                </button>
+                <button class="btn-cancel-reorder" onclick="window.ReorderManager.exitReorderMode()" style="display: none;">
+                    ❌ Cancelar Reordenamiento
+                </button>
             </div>
             
             <div class="multi-ai-section" style="display: none;" id="multiAISection">
@@ -287,6 +294,9 @@
     <script src="js/processing/stats-manager.js"></script>
     <script src="js/processing/batch-processor.js"></script>
     
+    <!-- M&oacute;dulos de Administraci&oacute;n -->
+    <script src="js/admin/reorder-manager.js"></script>
+    
     <!-- JavaScript -->
     <script>
         // Configuraci&oacute;n desde m&uacute;ltiples fuentes
@@ -322,10 +332,18 @@
             if (userRole === 'admin') {
                 userRoleElement.textContent = 'Administrador';
                 adminButton.style.display = 'block';
+                
+                // Mostrar botón de reordenamiento para administradores
+                const reorderButton = document.getElementById('reorderButton');
+                if (reorderButton) reorderButton.style.display = 'inline-block';
             } else {
                 userRoleElement.textContent = 'Usuario';
                 userRoleElement.style.color = 'green';
                 adminButton.style.display = 'none';
+                
+                // Ocultar botón de reordenamiento para usuarios normales
+                const reorderButton = document.getElementById('reorderButton');
+                if (reorderButton) reorderButton.style.display = 'none';
             }
         }
         
@@ -440,6 +458,9 @@
                 
                 if (window.StatsManager) window.StatsManager.initialize();
                 if (window.BatchProcessor) window.BatchProcessor.initialize();
+                
+                // Módulos de administración
+                if (window.ReorderManager) window.ReorderManager.initialize();
                 
                 console.log('✅ Aplicaci&oacute;n inicializada correctamente');
             } catch (error) {

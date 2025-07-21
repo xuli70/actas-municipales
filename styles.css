@@ -1870,6 +1870,226 @@ label {
     }
 }
 
+/* ============================================
+   Estilos para modo reordenamiento de actas
+   ============================================ */
+
+/* Botones de reordenamiento */
+.btn-reorder,
+.btn-cancel-reorder {
+    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    color: white;
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-left: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-reorder:hover,
+.btn-cancel-reorder:hover {
+    background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-cancel-reorder {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.btn-cancel-reorder:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+}
+
+/* Instrucciones de reordenamiento */
+.reorder-instructions {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.instructions-content h4 {
+    color: #92400e;
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 600;
+}
+
+.instructions-content p {
+    color: #78350f;
+    font-size: var(--font-size-lg);
+    margin: var(--spacing-sm) 0;
+    font-weight: 500;
+}
+
+/* Modo reordenamiento activo */
+.actas-list.reorder-mode {
+    background: #fefbf3;
+    border: 2px dashed #f59e0b;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+}
+
+.acta-item.reorderable {
+    position: relative;
+    border: 2px solid #e5e7eb;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+    background: white;
+    cursor: grab;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.acta-item.reorderable:hover {
+    border-color: #f59e0b;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.acta-item.reorderable.dragging {
+    opacity: 0.5;
+    transform: rotate(3deg);
+    cursor: grabbing;
+    z-index: 1000;
+    box-shadow: var(--shadow-xl);
+}
+
+/* Handle de arrastre */
+.drag-handle {
+    position: absolute;
+    left: var(--spacing-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--font-size-xl);
+    color: #9ca3af;
+    cursor: grab;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    user-select: none;
+    font-weight: bold;
+}
+
+.drag-handle:hover {
+    background: #f3f4f6;
+    color: #f59e0b;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.reorderable:hover .drag-handle {
+    color: #f59e0b;
+}
+
+/* Controles de orden */
+.order-controls {
+    position: absolute;
+    right: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: white;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e5e7eb;
+}
+
+.btn-move-up,
+.btn-move-down {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-move-up:hover,
+.btn-move-down:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-move-up:disabled,
+.btn-move-down:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+.order-number {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+    font-size: var(--font-size-base);
+    min-width: 32px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Ajustar contenido principal en modo reordenamiento */
+.acta-item.reorderable .acta-main {
+    margin-left: calc(var(--spacing-2xl) + var(--spacing-md));
+    margin-right: calc(120px + var(--spacing-md));
+    padding: var(--spacing-md) 0;
+}
+
+.acta-item.reorderable .acta-actions {
+    display: none; /* Ocultar acciones normales en modo reordenamiento */
+}
+
+/* Responsive para modo reordenamiento */
+@media (max-width: 768px) {
+    .order-controls {
+        position: static;
+        transform: none;
+        justify-content: center;
+        margin-top: var(--spacing-md);
+        width: 100%;
+    }
+    
+    .acta-item.reorderable .acta-main {
+        margin-left: calc(var(--spacing-xl) + var(--spacing-sm));
+        margin-right: var(--spacing-md);
+    }
+    
+    .drag-handle {
+        left: 0;
+        font-size: var(--font-size-lg);
+    }
+    
+    .instructions-content h4 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .instructions-content p {
+        font-size: var(--font-size-base);
+    }
+}
+
 /* Modo oscuro para consulta múltiple */
 @media (prefers-color-scheme: dark) {
     .multi-ai-section {
@@ -1913,5 +2133,42 @@ label {
         background: #374151;
         border-color: #4b5563;
         color: #d1d5db;
+    }
+    
+    /* Modo reordenamiento en modo oscuro */
+    .reorder-instructions {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        border-color: #f59e0b;
+    }
+    
+    .instructions-content h4 {
+        color: #fbbf24;
+    }
+    
+    .instructions-content p {
+        color: #d1d5db;
+    }
+    
+    .actas-list.reorder-mode {
+        background: #1f2937;
+        border-color: #f59e0b;
+    }
+    
+    .acta-item.reorderable {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .acta-item.reorderable:hover {
+        border-color: #f59e0b;
+    }
+    
+    .order-controls {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .drag-handle:hover {
+        background: #4b5563;
     }
 }

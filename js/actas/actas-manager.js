@@ -12,7 +12,8 @@ window.ActasManager = {
         actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
         
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc`, {
+            // Usar orden_manual si existe, sino usar fecha.desc como fallback
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nulls.last,fecha.desc`, {
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`

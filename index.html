@@ -367,6 +367,16 @@
             document.getElementById('adminSection').style.display = 'none';
             document.getElementById('backButton').style.display = 'block';
             
+            // Mostrar/ocultar botón de reordenamiento según rol
+            const reorderButton = document.getElementById('reorderButton');
+            if (reorderButton) {
+                if (userRole === 'admin') {
+                    reorderButton.style.display = 'inline-block';
+                } else {
+                    reorderButton.style.display = 'none';
+                }
+            }
+            
             // Cargar actas usando el nuevo módulo
             if (window.ActasManager && window.ActasManager.loadActas) {
                 window.ActasManager.loadActas();

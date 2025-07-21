@@ -51,6 +51,7 @@ window.Auth = {
             adminButton.style.display = 'block';
         } else {
             userRoleElement.textContent = 'Usuario';
+            userRoleElement.style.color = 'green';
             adminButton.style.display = 'none';
         }
         

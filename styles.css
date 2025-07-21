@@ -751,7 +751,7 @@ label {
 }
 
 .auth-title {
-    color: var(--color-primary-text);
+    color: white;
     font-size: var(--font-size-2xl);
     font-weight: 700;
     margin-bottom: var(--spacing-xl);
@@ -790,7 +790,7 @@ label {
 
 .user-info span {
     font-weight: 600;
-    color: var(--color-primary-text);
+    color: white !important;
     font-size: var(--font-size-lg);
 }
 
@@ -1139,7 +1139,7 @@ label {
 
 .modal-header h3 {
     margin: 0;
-    color: var(--color-primary-text);
+    color: white;
     font-size: var(--font-size-xl);
     font-weight: 700;
 }

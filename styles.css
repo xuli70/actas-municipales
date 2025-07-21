@@ -561,16 +561,13 @@ label {
         overflow-x: visible;
     }
     
-    /* Ajustes para actas list en móviles */
+    /* Ajustes para actas list en móviles - mismo ancho que .loading */
     .actas-list {
-        margin: 0;
-        margin-left: calc(-1 * var(--spacing-sm));
-        margin-right: calc(-1 * var(--spacing-sm));
-        width: calc(100% + 2 * var(--spacing-sm));
-        border-radius: 0;
-        box-shadow: none;
-        border-left: none;
-        border-right: none;
+        margin: var(--spacing-xl) 0;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 2px solid var(--color-border);
+        background: var(--color-bg-primary);
     }
     
     .acta-item {
@@ -604,13 +601,13 @@ label {
         font-size: var(--font-size-base);
     }
     
-    /* Ajustes adicionales para actas en móviles pequeños */
+    /* Ajustes adicionales para actas en móviles pequeños - mismo ancho que .loading */
     .actas-list {
-        margin: 0;
-        margin-left: calc(-1 * var(--spacing-xs));
-        margin-right: calc(-1 * var(--spacing-xs));
-        width: calc(100% + 2 * var(--spacing-xs));
-        padding: 0;
+        margin: var(--spacing-xl) 0;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 2px solid var(--color-border);
+        background: var(--color-bg-primary);
     }
     
     .acta-item {

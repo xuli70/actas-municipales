@@ -72,7 +72,11 @@ window.ReorderManager = {
      */
     async loadCurrentActas() {
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nulls.last,fecha.desc`, {
+            // Usar la función con orden personalizado del ActasManager
+            await window.ActasManager.loadActasWithCustomOrder();
+            
+            // Obtener las actas cargadas desde Supabase para uso interno
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nullslast,fecha.desc`, {
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`

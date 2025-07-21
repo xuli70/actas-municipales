@@ -12,8 +12,7 @@ window.ActasManager = {
         actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
         
         try {
-            // Usar orden_manual si existe, sino usar fecha.desc como fallback
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nulls.last,fecha.desc`, {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc`, {
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -21,6 +20,39 @@ window.ActasManager = {
             });
             
             if (!response.ok) throw new Error('Error al cargar actas');
+            
+            const actas = await response.json();
+            
+            if (actas.length === 0) {
+                actasList.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No hay actas disponibles</p>';
+                return;
+            }
+            
+            actasList.innerHTML = this.renderActasList(actas);
+                
+        } catch (error) {
+            actasList.innerHTML = '<div class="error">Error al cargar las actas. Por favor, intente más tarde.</div>';
+            console.error('Error:', error);
+        }
+    },
+
+    /**
+     * Cargar actas con orden personalizado (para reordenamiento)
+     */
+    async loadActasWithCustomOrder() {
+        const actasList = document.getElementById('actasList');
+        actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
+        
+        try {
+            // Usar orden manual con fallback a fecha - Solo para modo reordenamiento
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nullslast,fecha.desc`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            
+            if (!response.ok) throw new Error('Error al cargar actas con orden personalizado');
             
             const actas = await response.json();
             
@@ -91,4 +123,5 @@ window.ActasManager = {
 
 // Mantener compatibilidad con funciones globales
 window.loadActas = () => window.ActasManager.loadActas();
+window.loadActasWithCustomOrder = () => window.ActasManager.loadActasWithCustomOrder();
 window.getStatusBadge = (status) => window.ActasManager.getStatusBadge(status);

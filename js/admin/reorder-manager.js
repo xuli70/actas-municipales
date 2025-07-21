@@ -25,7 +25,7 @@ window.ReorderManager = {
     /**
      * Entrar en modo reordenamiento
      */
-    enterReorderMode() {
+    async enterReorderMode() {
         if (userRole !== 'admin') {
             alert('Solo los administradores pueden reordenar las actas.');
             return;
@@ -34,10 +34,10 @@ window.ReorderManager = {
         console.log('🔄 Activando modo reordenamiento');
         this.reorderMode = true;
         
-        // Cargar actas actuales
-        this.loadCurrentActas();
+        // Cargar actas actuales y esperar a que termine
+        await this.loadCurrentActas();
         
-        // Actualizar UI
+        // Actualizar UI después de cargar
         this.updateUIForReorderMode();
         
         // Configurar drag and drop
@@ -99,13 +99,23 @@ window.ReorderManager = {
      */
     updateUIForReorderMode() {
         const actasList = document.getElementById('actasList');
-        if (!actasList) return;
+        if (!actasList) {
+            console.error('❌ No se encontró elemento actasList');
+            return;
+        }
         
         // Agregar clase de modo reordenamiento
         actasList.classList.add('reorder-mode');
         
-        // Agregar controles de reordenamiento a cada acta
-        const actasItems = actasList.querySelectorAll('.acta-item');
+        // Agregar controles de reordenamiento a cada acta - buscar dentro de .actas-list
+        const actasItems = actasList.querySelectorAll('.actas-list .acta-item');
+        console.log(`📋 Encontrados ${actasItems.length} items de actas para reordenar`);
+        
+        if (actasItems.length === 0) {
+            console.error('❌ No se encontraron items de actas para reordenar');
+            return;
+        }
+        
         actasItems.forEach((item, index) => {
             this.addReorderControls(item, index);
         });
@@ -125,6 +135,14 @@ window.ReorderManager = {
      * Agregar controles de reordenamiento a un item de acta
      */
     addReorderControls(item, index) {
+        console.log(`🔧 Agregando controles a acta ${index}:`, item.dataset.actaId);
+        
+        // Verificar que el item tiene actaId
+        if (!item.dataset.actaId) {
+            console.error(`❌ Item ${index} no tiene data-acta-id`);
+            return;
+        }
+        
         // Hacer el item arrastrable
         item.setAttribute('draggable', 'true');
         item.classList.add('reorderable');
@@ -139,9 +157,9 @@ window.ReorderManager = {
         const orderControls = document.createElement('div');
         orderControls.className = 'order-controls';
         orderControls.innerHTML = `
-            <button class="btn-move-up" onclick="ReorderManager.moveUp(${index})" title="Subir" ${index === 0 ? 'disabled' : ''}>↑</button>
+            <button class="btn-move-up" onclick="window.ReorderManager.moveUp(${index})" title="Subir" ${index === 0 ? 'disabled' : ''}>↑</button>
             <span class="order-number">${index + 1}</span>
-            <button class="btn-move-down" onclick="ReorderManager.moveDown(${index})" title="Bajar" ${index === this.actas.length - 1 ? 'disabled' : ''}>↓</button>
+            <button class="btn-move-down" onclick="window.ReorderManager.moveDown(${index})" title="Bajar" ${index === this.actas.length - 1 ? 'disabled' : ''}>↓</button>
         `;
         
         // Insertar controles al inicio del item
@@ -284,6 +302,7 @@ window.ReorderManager = {
      */
     async saveOrderToDatabase(items) {
         console.log('💾 Guardando nuevo orden en Supabase...');
+        console.log(`📝 Actualizando ${items.length} actas`);
         
         try {
             const updates = items.map((item, index) => ({
@@ -291,8 +310,12 @@ window.ReorderManager = {
                 orden_manual: index + 1
             }));
             
+            console.log('📋 Updates a realizar:', updates);
+            
             // Actualizar cada acta individualmente
             for (const update of updates) {
+                console.log(`🔄 Actualizando acta ${update.id} con orden ${update.orden_manual}`);
+                
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`, {
                     method: 'PATCH',
                     headers: {

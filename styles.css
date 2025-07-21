@@ -555,6 +555,25 @@ label {
     .form-group {
         margin-bottom: var(--spacing-lg);
     }
+    
+    /* Ajustes para actas list en móviles */
+    .actas-list {
+        margin: var(--spacing-sm) 0;
+        border-radius: 0;
+        box-shadow: none;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .acta-item {
+        padding: var(--spacing-lg) var(--spacing-md);
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    .acta-item:hover {
+        padding-left: var(--spacing-lg);
+    }
 }
 
 @media (max-width: 480px) {
@@ -575,6 +594,36 @@ label {
     .btn {
         max-width: 100%;
         font-size: var(--font-size-base);
+    }
+    
+    /* Ajustes adicionales para actas en móviles pequeños */
+    .actas-list {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .acta-item {
+        padding: var(--spacing-md) var(--spacing-sm);
+        border-left: none;
+        border-right: none;
+    }
+    
+    .acta-item:hover {
+        padding-left: var(--spacing-md);
+    }
+    
+    .acta-filename {
+        font-size: var(--font-size-lg);
+        padding: var(--spacing-xs) 0;
+    }
+    
+    /* Ajuste para modo selección en móviles */
+    .acta-item.selection-mode {
+        padding-left: 40px;
+    }
+    
+    .acta-selector {
+        left: 10px;
     }
 }
 

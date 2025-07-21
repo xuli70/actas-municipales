@@ -398,6 +398,11 @@ label {
     padding: var(--spacing-xl);
 }
 
+/* Eliminar el icono ::before para que el texto ocupe todo el ancho */
+#actasList.loading::before {
+    display: none;
+}
+
 @keyframes pulse {
     0%, 100% { opacity: 0.8; }
     50% { opacity: 1; }

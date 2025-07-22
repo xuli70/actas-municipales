@@ -16,10 +16,40 @@ window.ReorderManager = {
     },
     
     /**
-     * Configurar event listeners
+     * Configurar event listeners usando delegación de eventos
      */
     setupEventListeners() {
-        // Los event listeners se configurarán cuando se active el modo
+        const actasList = document.getElementById('actasList');
+        if (!actasList) return;
+        
+        // Usar delegación de eventos para manejar clicks en botones de flecha
+        actasList.addEventListener('click', (e) => {
+            // Verificar si se hizo click en un botón de mover hacia arriba
+            if (e.target.classList.contains('btn-move-up')) {
+                e.preventDefault();
+                const actaItem = e.target.closest('.acta-item');
+                if (actaItem) {
+                    const currentIndex = this.getCurrentIndex(actaItem);
+                    console.log(`🔼 Delegated click: Moviendo hacia arriba desde posición: ${currentIndex}`);
+                    this.moveUp(currentIndex);
+                }
+                return;
+            }
+            
+            // Verificar si se hizo click en un botón de mover hacia abajo
+            if (e.target.classList.contains('btn-move-down')) {
+                e.preventDefault();
+                const actaItem = e.target.closest('.acta-item');
+                if (actaItem) {
+                    const currentIndex = this.getCurrentIndex(actaItem);
+                    console.log(`🔽 Delegated click: Moviendo hacia abajo desde posición: ${currentIndex}`);
+                    this.moveDown(currentIndex);
+                }
+                return;
+            }
+        });
+        
+        console.log('✅ Event delegation configurado para botones de reordenamiento');
     },
     
     /**
@@ -166,18 +196,8 @@ window.ReorderManager = {
         downBtn.title = 'Bajar';
         downBtn.disabled = index === this.actas.length - 1;
         
-        // Agregar event listeners dinámicos
-        upBtn.addEventListener('click', () => {
-            const currentIndex = this.getCurrentIndex(item);
-            console.log(`🔼 Moviendo hacia arriba desde posición: ${currentIndex}`);
-            this.moveUp(currentIndex);
-        });
-        
-        downBtn.addEventListener('click', () => {
-            const currentIndex = this.getCurrentIndex(item);
-            console.log(`🔽 Moviendo hacia abajo desde posición: ${currentIndex}`);
-            this.moveDown(currentIndex);
-        });
+        // Los event listeners se manejan via delegación de eventos
+        // Ver setupEventListeners() para la implementación
         
         // Crear contenedor de controles
         const orderControls = document.createElement('div');
@@ -491,6 +511,9 @@ window.ReorderManager = {
         });
     }
 };
+
+// Inicializar el módulo cuando se carga
+window.ReorderManager.initialize();
 
 // Mantener compatibilidad con funciones globales
 window.enterReorderMode = () => window.ReorderManager.enterReorderMode();

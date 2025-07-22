@@ -363,8 +363,8 @@ window.ReorderManager = {
         
         console.log(`🔄 Moviendo item ${index} (${currentItem.dataset.actaId}) después de item ${index + 1} (${nextItem.dataset.actaId})`);
         
-        // Mover el siguiente elemento antes del actual (equivale a mover actual después del siguiente)
-        actasList.insertBefore(nextItem, currentItem);
+        // Mover el elemento actual después del siguiente
+        actasList.insertBefore(currentItem, nextItem.nextSibling);
         
         this.updateOrder();
     },

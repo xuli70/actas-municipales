@@ -24,14 +24,26 @@ window.ReorderManager = {
         
         // Usar delegación de eventos para manejar clicks en botones de flecha
         actasList.addEventListener('click', (e) => {
+            console.log('🔍 DEBUG Event delegation click:', e.target.className, e.target.tagName);
+            
             // Verificar si se hizo click en un botón de mover hacia arriba
             if (e.target.classList.contains('btn-move-up')) {
                 e.preventDefault();
+                e.stopPropagation(); // Evitar propagación
+                console.log('🔼 DEBUG: Click en btn-move-up detectado');
+                
                 const actaItem = e.target.closest('.acta-item');
                 if (actaItem) {
                     const currentIndex = this.getCurrentIndex(actaItem);
                     console.log(`🔼 Delegated click: Moviendo hacia arriba desde posición: ${currentIndex}`);
+                    
+                    // Deshabilitar temporalmente el botón para evitar dobles clicks
+                    e.target.disabled = true;
+                    setTimeout(() => e.target.disabled = false, 500);
+                    
                     this.moveUp(currentIndex);
+                } else {
+                    console.log('❌ No se encontró .acta-item padre');
                 }
                 return;
             }
@@ -39,11 +51,21 @@ window.ReorderManager = {
             // Verificar si se hizo click en un botón de mover hacia abajo
             if (e.target.classList.contains('btn-move-down')) {
                 e.preventDefault();
+                e.stopPropagation(); // Evitar propagación
+                console.log('🔽 DEBUG: Click en btn-move-down detectado');
+                
                 const actaItem = e.target.closest('.acta-item');
                 if (actaItem) {
                     const currentIndex = this.getCurrentIndex(actaItem);
                     console.log(`🔽 Delegated click: Moviendo hacia abajo desde posición: ${currentIndex}`);
+                    
+                    // Deshabilitar temporalmente el botón para evitar dobles clicks
+                    e.target.disabled = true;
+                    setTimeout(() => e.target.disabled = false, 500);
+                    
                     this.moveDown(currentIndex);
+                } else {
+                    console.log('❌ No se encontró .acta-item padre');
                 }
                 return;
             }
@@ -347,7 +369,7 @@ window.ReorderManager = {
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
         const items = Array.from(actasList.children);
         
-        console.log(`📋 Total items disponibles: ${items.length}`);
+        console.log(`📋 DEBUG Antes movimiento: [${items.map((item, i) => `${i}:${item.dataset.actaId}`).join(', ')}]`);
         
         if (index >= items.length - 1) {
             console.log(`❌ No se puede mover hacia abajo: índice ${index} es el último`);
@@ -362,11 +384,18 @@ window.ReorderManager = {
         const currentItem = items[index];
         const nextItem = items[index + 1];
         
-        console.log(`🔄 Intercambiando posiciones: item ${index} (${currentItem.dataset.actaId}) baja a posición ${index + 1}, item ${index + 1} (${nextItem.dataset.actaId}) sube a posición ${index}`);
+        console.log(`🔄 ANTES: ${currentItem.dataset.actaId} en posición ${index}, ${nextItem.dataset.actaId} en posición ${index + 1}`);
         
         // Intercambiar elementos: mover el elemento siguiente antes del actual
         // Esto hace que el elemento actual baje exactamente 1 posición
         actasList.insertBefore(nextItem, currentItem);
+        
+        // Verificar después del movimiento
+        const newItems = Array.from(actasList.children);
+        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId}`).join(', ')}]`);
+        
+        const newIndexOfMoved = newItems.findIndex(item => item.dataset.actaId === currentItem.dataset.actaId);
+        console.log(`📊 ${currentItem.dataset.actaId} se movió de posición ${index} a posición ${newIndexOfMoved} (cambio: ${newIndexOfMoved - index})`);
         
         this.updateOrder();
     },

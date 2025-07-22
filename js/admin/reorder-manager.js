@@ -153,14 +153,45 @@ window.ReorderManager = {
         dragHandle.innerHTML = '⋮⋮';
         dragHandle.title = 'Arrastra para reordenar';
         
-        // Agregar botones de orden
+        // Crear botones de orden
+        const upBtn = document.createElement('button');
+        upBtn.className = 'btn-move-up';
+        upBtn.innerHTML = '↑';
+        upBtn.title = 'Subir';
+        upBtn.disabled = index === 0;
+        
+        const downBtn = document.createElement('button');
+        downBtn.className = 'btn-move-down';
+        downBtn.innerHTML = '↓';
+        downBtn.title = 'Bajar';
+        downBtn.disabled = index === this.actas.length - 1;
+        
+        // Agregar event listeners dinámicos
+        upBtn.addEventListener('click', () => {
+            const currentIndex = this.getCurrentIndex(item);
+            console.log(`🔼 Moviendo hacia arriba desde posición: ${currentIndex}`);
+            this.moveUp(currentIndex);
+        });
+        
+        downBtn.addEventListener('click', () => {
+            const currentIndex = this.getCurrentIndex(item);
+            console.log(`🔽 Moviendo hacia abajo desde posición: ${currentIndex}`);
+            this.moveDown(currentIndex);
+        });
+        
+        // Crear contenedor de controles
         const orderControls = document.createElement('div');
         orderControls.className = 'order-controls';
-        orderControls.innerHTML = `
-            <button class="btn-move-up" onclick="window.ReorderManager.moveUp(${index})" title="Subir" ${index === 0 ? 'disabled' : ''}>↑</button>
-            <span class="order-number">${index + 1}</span>
-            <button class="btn-move-down" onclick="window.ReorderManager.moveDown(${index})" title="Bajar" ${index === this.actas.length - 1 ? 'disabled' : ''}>↓</button>
-        `;
+        
+        // Agregar span con número de orden
+        const orderNumber = document.createElement('span');
+        orderNumber.className = 'order-number';
+        orderNumber.textContent = index + 1;
+        
+        // Ensamblar controles
+        orderControls.appendChild(upBtn);
+        orderControls.appendChild(orderNumber);
+        orderControls.appendChild(downBtn);
         
         // Insertar controles al inicio del item
         item.insertBefore(dragHandle, item.firstChild);
@@ -168,6 +199,15 @@ window.ReorderManager = {
         
         // Guardar índice original
         item.dataset.originalIndex = index;
+    },
+    
+    /**
+     * Obtener índice actual de un elemento en el DOM
+     */
+    getCurrentIndex(item) {
+        const actasList = document.getElementById('actasList').querySelector('.actas-list');
+        const items = Array.from(actasList.children);
+        return items.indexOf(item);
     },
     
     /**
@@ -249,27 +289,63 @@ window.ReorderManager = {
      * Mover acta hacia arriba
      */
     moveUp(index) {
-        if (index <= 0) return;
+        console.log(`🔼 MoveUp llamado con índice: ${index}`);
+        
+        if (index <= 0) {
+            console.log(`❌ No se puede mover hacia arriba: índice ${index} es el primero`);
+            return;
+        }
         
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
-        const items = actasList.children;
+        const items = Array.from(actasList.children);
         
-        if (index < items.length) {
-            actasList.insertBefore(items[index], items[index - 1]);
-            this.updateOrder();
+        console.log(`📋 Total items disponibles: ${items.length}`);
+        
+        if (index >= items.length) {
+            console.error(`❌ Índice fuera de rango: ${index} >= ${items.length}`);
+            return;
         }
+        
+        const currentItem = items[index];
+        const previousItem = items[index - 1];
+        
+        console.log(`🔄 Moviendo item ${index} (${currentItem.dataset.actaId}) antes de item ${index - 1} (${previousItem.dataset.actaId})`);
+        
+        // Mover el elemento actual antes del anterior
+        actasList.insertBefore(currentItem, previousItem);
+        
+        this.updateOrder();
     },
     
     /**
      * Mover acta hacia abajo
      */
     moveDown(index) {
+        console.log(`🔽 MoveDown llamado con índice: ${index}`);
+        
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
-        const items = actasList.children;
+        const items = Array.from(actasList.children);
         
-        if (index >= items.length - 1) return;
+        console.log(`📋 Total items disponibles: ${items.length}`);
         
-        actasList.insertBefore(items[index + 1], items[index]);
+        if (index >= items.length - 1) {
+            console.log(`❌ No se puede mover hacia abajo: índice ${index} es el último`);
+            return;
+        }
+        
+        if (index < 0 || index >= items.length) {
+            console.error(`❌ Índice fuera de rango: ${index} no válido para ${items.length} items`);
+            return;
+        }
+        
+        const currentItem = items[index];
+        const nextItem = items[index + 1];
+        
+        console.log(`🔄 Moviendo item ${index} (${currentItem.dataset.actaId}) después de item ${index + 1} (${nextItem.dataset.actaId})`);
+        
+        // Mover el siguiente elemento antes del actual (equivale a mover actual después del siguiente)
+        actasList.insertBefore(nextItem, currentItem);
+        
         this.updateOrder();
     },
     
@@ -277,21 +353,42 @@ window.ReorderManager = {
      * Actualizar orden después de cambios
      */
     async updateOrder() {
-        const actasList = document.getElementById('actasList').querySelector('.actas-list');
-        const items = [...actasList.children];
+        console.log('🔄 Iniciando actualización de orden');
         
-        // Actualizar números de orden en UI
+        const actasList = document.getElementById('actasList').querySelector('.actas-list');
+        const items = Array.from(actasList.children);
+        
+        console.log(`📋 Actualizando orden para ${items.length} items`);
+        
+        // Actualizar números de orden en UI y estados de botones
         items.forEach((item, index) => {
-            const orderNumber = item.querySelector('.order-number');
-            if (orderNumber) orderNumber.textContent = index + 1;
+            console.log(`🔧 Actualizando item ${index}: ${item.dataset.actaId}`);
             
-            // Actualizar botones
+            // Actualizar número de orden
+            const orderNumber = item.querySelector('.order-number');
+            if (orderNumber) {
+                orderNumber.textContent = index + 1;
+                console.log(`📊 Número actualizado a: ${index + 1}`);
+            }
+            
+            // Actualizar estado de botones
             const upBtn = item.querySelector('.btn-move-up');
             const downBtn = item.querySelector('.btn-move-down');
             
-            if (upBtn) upBtn.disabled = index === 0;
-            if (downBtn) downBtn.disabled = index === items.length - 1;
+            if (upBtn) {
+                const shouldDisableUp = index === 0;
+                upBtn.disabled = shouldDisableUp;
+                console.log(`🔼 Botón subir ${shouldDisableUp ? 'deshabilitado' : 'habilitado'} para item ${index}`);
+            }
+            
+            if (downBtn) {
+                const shouldDisableDown = index === items.length - 1;
+                downBtn.disabled = shouldDisableDown;
+                console.log(`🔽 Botón bajar ${shouldDisableDown ? 'deshabilitado' : 'habilitado'} para item ${index}`);
+            }
         });
+        
+        console.log('💾 Procediendo a guardar orden en base de datos');
         
         // Guardar orden en Supabase
         await this.saveOrderToDatabase(items);

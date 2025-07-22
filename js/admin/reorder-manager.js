@@ -357,7 +357,15 @@ window.ReorderManager = {
         // Esto hace que el elemento actual suba exactamente 1 posición
         actasList.insertBefore(currentItem, previousItem);
         
-        this.updateOrder();
+        // Verificar después del movimiento
+        const newItems = Array.from(actasList.children);
+        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId}`).join(', ')}]`);
+        
+        const newIndexOfMoved = newItems.findIndex(item => item.dataset.actaId === currentItem.dataset.actaId);
+        console.log(`📊 ${currentItem.dataset.actaId} se movió de posición ${index} a posición ${newIndexOfMoved} (cambio: ${newIndexOfMoved - index})`);
+        
+        // Usar setTimeout para asegurar que el DOM esté completamente estable
+        setTimeout(() => this.updateOrder(), 0);
     },
     
     /**
@@ -397,17 +405,34 @@ window.ReorderManager = {
         const newIndexOfMoved = newItems.findIndex(item => item.dataset.actaId === currentItem.dataset.actaId);
         console.log(`📊 ${currentItem.dataset.actaId} se movió de posición ${index} a posición ${newIndexOfMoved} (cambio: ${newIndexOfMoved - index})`);
         
-        this.updateOrder();
+        // Usar setTimeout para asegurar que el DOM esté completamente estable
+        setTimeout(() => this.updateOrder(), 0);
     },
     
     /**
      * Actualizar orden después de cambios
      */
     async updateOrder() {
+        // Prevenir múltiples ejecuciones simultáneas
+        if (this._updating) {
+            console.log('⏳ updateOrder ya se está ejecutando, ignorando llamada duplicada');
+            return;
+        }
+        this._updating = true;
+        
         console.log('🔄 Iniciando actualización de orden');
         
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
         const items = Array.from(actasList.children);
+        
+        // Verificar que no hay duplicados en los IDs
+        const ids = items.map(item => item.dataset.actaId);
+        const uniqueIds = [...new Set(ids)];
+        if (ids.length !== uniqueIds.length) {
+            console.error('❌ DETECTADOS IDs DUPLICADOS en el DOM:', ids);
+            this._updating = false;
+            return;
+        }
         
         console.log(`📋 Actualizando orden para ${items.length} items`);
         
@@ -484,6 +509,9 @@ window.ReorderManager = {
         } catch (error) {
             console.error('❌ Error guardando orden:', error);
             alert('Error al guardar el nuevo orden. Por favor, intente nuevamente.');
+        } finally {
+            // Liberar el flag de actualización
+            this._updating = false;
         }
     },
     

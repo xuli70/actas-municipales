@@ -341,7 +341,7 @@ window.ReorderManager = {
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
         const items = Array.from(actasList.children);
         
-        console.log(`📋 Total items disponibles: ${items.length}`);
+        console.log(`📋 DEBUG Antes movimiento: [${items.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
         
         if (index >= items.length) {
             console.error(`❌ Índice fuera de rango: ${index} >= ${items.length}`);
@@ -351,18 +351,36 @@ window.ReorderManager = {
         const currentItem = items[index];
         const previousItem = items[index - 1];
         
-        console.log(`🔄 Intercambiando posiciones: item ${index} (${currentItem.dataset.actaId}) sube a posición ${index - 1}, item ${index - 1} (${previousItem.dataset.actaId}) baja a posición ${index}`);
+        console.log(`🔄 ANTES: ${previousItem.dataset.actaId.slice(-4)} en posición ${index}, ${currentItem.dataset.actaId.slice(-4)} en posición ${index + 1}`);
         
-        // Intercambiar elementos: mover el elemento actual antes del anterior
-        // Esto hace que el elemento actual suba exactamente 1 posición
-        actasList.insertBefore(currentItem, previousItem);
+        // MÉTODO CORRECTO: Intercambio simple de elementos adyacentes
+        // Crear un nodo temporal para hacer el intercambio
+        const tempNode = document.createElement('div');
+        
+        // 1. Insertar nodo temporal antes de previousItem
+        actasList.insertBefore(tempNode, previousItem);
+        
+        // 2. Remover currentItem de su posición actual  
+        actasList.removeChild(currentItem);
+        
+        // 3. Insertar currentItem donde estaba previousItem (antes del nodo temporal)
+        actasList.insertBefore(currentItem, tempNode);
+        
+        // 4. Remover nodo temporal
+        actasList.removeChild(tempNode);
         
         // Verificar después del movimiento
         const newItems = Array.from(actasList.children);
-        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId}`).join(', ')}]`);
+        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
         
         const newIndexOfMoved = newItems.findIndex(item => item.dataset.actaId === currentItem.dataset.actaId);
-        console.log(`📊 ${currentItem.dataset.actaId} se movió de posición ${index} a posición ${newIndexOfMoved} (cambio: ${newIndexOfMoved - index})`);
+        console.log(`📊 ${currentItem.dataset.actaId.slice(-4)} se movió de posición ${index + 1} a posición ${newIndexOfMoved + 1} (cambio: ${newIndexOfMoved - index})`);
+        
+        if (newIndexOfMoved - index !== -1) {
+            console.error(`❌ ERROR: El elemento se movió ${newIndexOfMoved - index} posiciones en lugar de -1`);
+        } else {
+            console.log(`✅ CORRECTO: Movimiento de exactamente 1 posición hacia arriba`);
+        }
         
         // Usar setTimeout para asegurar que el DOM esté completamente estable
         setTimeout(() => this.updateOrder(), 0);
@@ -377,7 +395,7 @@ window.ReorderManager = {
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
         const items = Array.from(actasList.children);
         
-        console.log(`📋 DEBUG Antes movimiento: [${items.map((item, i) => `${i}:${item.dataset.actaId}`).join(', ')}]`);
+        console.log(`📋 DEBUG Antes movimiento: [${items.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
         
         if (index >= items.length - 1) {
             console.log(`❌ No se puede mover hacia abajo: índice ${index} es el último`);
@@ -392,18 +410,36 @@ window.ReorderManager = {
         const currentItem = items[index];
         const nextItem = items[index + 1];
         
-        console.log(`🔄 ANTES: ${currentItem.dataset.actaId} en posición ${index}, ${nextItem.dataset.actaId} en posición ${index + 1}`);
+        console.log(`🔄 ANTES: ${currentItem.dataset.actaId.slice(-4)} en posición ${index + 1}, ${nextItem.dataset.actaId.slice(-4)} en posición ${index + 2}`);
         
-        // Intercambiar elementos: mover el elemento siguiente antes del actual
-        // Esto hace que el elemento actual baje exactamente 1 posición
-        actasList.insertBefore(nextItem, currentItem);
+        // MÉTODO CORRECTO: Intercambio simple de elementos adyacentes
+        // Crear un nodo temporal para hacer el intercambio
+        const tempNode = document.createElement('div');
+        
+        // 1. Insertar nodo temporal antes de currentItem
+        actasList.insertBefore(tempNode, currentItem);
+        
+        // 2. Remover nextItem de su posición actual  
+        actasList.removeChild(nextItem);
+        
+        // 3. Insertar nextItem donde estaba currentItem (antes del nodo temporal)
+        actasList.insertBefore(nextItem, tempNode);
+        
+        // 4. Remover nodo temporal
+        actasList.removeChild(tempNode);
         
         // Verificar después del movimiento
         const newItems = Array.from(actasList.children);
-        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId}`).join(', ')}]`);
+        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
         
         const newIndexOfMoved = newItems.findIndex(item => item.dataset.actaId === currentItem.dataset.actaId);
-        console.log(`📊 ${currentItem.dataset.actaId} se movió de posición ${index} a posición ${newIndexOfMoved} (cambio: ${newIndexOfMoved - index})`);
+        console.log(`📊 ${currentItem.dataset.actaId.slice(-4)} se movió de posición ${index + 1} a posición ${newIndexOfMoved + 1} (cambio: ${newIndexOfMoved - index})`);
+        
+        if (newIndexOfMoved - index !== 1) {
+            console.error(`❌ ERROR: El elemento se movió ${newIndexOfMoved - index} posiciones en lugar de 1`);
+        } else {
+            console.log(`✅ CORRECTO: Movimiento de exactamente 1 posición`);
+        }
         
         // Usar setTimeout para asegurar que el DOM esté completamente estable
         setTimeout(() => this.updateOrder(), 0);

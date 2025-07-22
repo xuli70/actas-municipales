@@ -96,7 +96,8 @@ window.ReorderManager = {
         // Restaurar UI normal
         this.restoreNormalUI();
         
-        // Recargar actas con orden personalizado actualizado
+        // CRITICAL FIX: Recargar actas con orden personalizado actualizado
+        // Usar loadActasWithCustomOrder() en lugar de loadActas() para mantener consistencia
         if (window.ActasManager && window.ActasManager.loadActasWithCustomOrder) {
             window.ActasManager.loadActasWithCustomOrder();
         }

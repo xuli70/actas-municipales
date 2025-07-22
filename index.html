@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Actas Municipales - Ayuntamiento</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_reorder.css">
     <!-- PDF.js para extracción de texto -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="pdf_text_extractor.js"></script>
@@ -17,37 +18,37 @@
     </header>
     
     <div class="container">
-        <!-- Pantalla de autenticaci&oacute;n -->
+        <!-- Pantalla de autenticación -->
         <div id="authScreen" class="auth-screen">
             <h2 class="auth-title">Acceso al Sistema</h2>
             <form id="authForm">
                 <div class="form-group">
-                    <label for="password">Contrase&ntilde;a de acceso:</label>
+                    <label for="password">Contraseña de acceso:</label>
                     <input type="password" id="password" name="password" 
                            required class="password-input" 
-                           placeholder="Ingrese su contrase&ntilde;a">
+                           placeholder="Ingrese su contraseña">
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    &#128273; Ingresar
+                    🔑 Ingresar
                 </button>
             </form>
             <div id="authMessage"></div>
         </div>
         
-        <!-- Men&uacute; principal -->
+        <!-- Menú principal -->
         <div id="mainMenu" class="main-menu" style="display: none;">
             <div class="user-info">
                 <span id="userRole"></span>
                 <button class="btn-logout" onclick="logout()">
-                    &#128274; Cerrar Sesi&oacute;n
+                    🔒 Cerrar Sesión
                 </button>
             </div>
-            <h2 class="menu-title">&iquest;Qu&eacute; desea hacer?</h2>
+            <h2 class="menu-title">¿Qué desea hacer?</h2>
             <button class="btn" onclick="showActas()">
-                &#128194; Ver Actas
+                📂 Ver Actas
             </button>
             <button class="btn btn-secondary" id="adminButton" onclick="showAdmin()" style="display: none;">
-                &#128194; Subir Nueva Acta
+                📂 Subir Nueva Acta
             </button>
         </div>
         
@@ -57,27 +58,28 @@
                 Actas Disponibles
             </h2>
             
-            <!-- Consulta IA M&uacute;ltiple -->
+            <!-- Consulta IA Múltiple -->
             <div class="multi-ai-controls">
                 <button class="btn-start-selection" onclick="window.MultiSelector.enterSelectionMode()">
                     ☑️ Seleccionar Actas para Consulta IA
                 </button>
-                <!-- Bot&oacute;n de reordenamiento solo para admin -->
+                <!-- ===== BOTONES DE REORDENAMIENTO ===== -->
                 <button class="btn-reorder" id="reorderButton" onclick="window.ReorderManager.enterReorderMode()" style="display: none;">
                     📝 Reordenar Actas
                 </button>
                 <button class="btn-cancel-reorder" onclick="window.ReorderManager.exitReorderMode()" style="display: none;">
                     ❌ Cancelar Reordenamiento
                 </button>
+                <!-- ===== FIN BOTONES DE REORDENAMIENTO ===== -->
             </div>
             
             <div class="multi-ai-section" style="display: none;" id="multiAISection">
                 <div class="multi-ai-header">
                     <button class="btn-multi-ai" onclick="window.MultiAIModal.open()">
-                        🤖 Consultar IA - M&uacute;ltiples Actas (<span id="selectedCount">0</span>)
+                        🤖 Consultar IA - Múltiples Actas (<span id="selectedCount">0</span>)
                     </button>
                     <button class="btn-cancel-selection" onclick="window.MultiSelector.exitSelectionMode()">
-                        ❌ Cancelar Selecci&oacute;n
+                        ❌ Cancelar Selección
                     </button>
                 </div>
                 <div class="selection-summary">
@@ -85,7 +87,7 @@
                 </div>
             </div>
             
-            <!-- B&uacute;squeda -->
+            <!-- Búsqueda -->
             <div class="search-container">
                 <form id="searchForm">
                     <div class="search-input-group">
@@ -95,7 +97,7 @@
                                placeholder="Buscar en actas..." 
                                autocomplete="off">
                         <button type="submit" class="btn-search">
-                            &#128269; Buscar
+                            🔍 Buscar
                         </button>
                     </div>
                 </form>
@@ -103,12 +105,12 @@
                         class="btn-clear-search" 
                         style="display: none;"
                         onclick="clearSearch()">
-                    &#10006; Limpiar b&uacute;squeda
+                    ✖ Limpiar búsqueda
                 </button>
             </div>
             
             <div id="searchResults" class="search-results" style="display: none;">
-                <h3 class="search-results-title">Resultados de b&uacute;squeda:</h3>
+                <h3 class="search-results-title">Resultados de búsqueda:</h3>
                 <div id="searchResultsList"></div>
             </div>
             
@@ -131,10 +133,10 @@
                         <label for="aiQuery">Pregunta a la IA sobre este acta:</label>
                         <textarea id="aiQuery" 
                                   class="ai-query-input" 
-                                  placeholder="Ejemplo: &iquest;Cu&aacute;les fueron los principales acuerdos? &iquest;Qui&eacute;n vot&oacute; en contra? &iquest;Cu&aacute;nto presupuesto se aprob&oacute;?"
+                                  placeholder="Ejemplo: ¿Cuáles fueron los principales acuerdos? ¿Quién votó en contra? ¿Cuánto presupuesto se aprobó?"
                                   rows="3"></textarea>
                         <button id="askAIBtn" class="btn btn-primary" onclick="askAI()">
-                            &#129302; Preguntar a la IA
+                            🤖 Preguntar a la IA
                         </button>
                     </div>
                     
@@ -149,17 +151,17 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn" onclick="openPDF(currentActaUrl)">&#128196; Ver PDF</button>
+                    <button class="btn" onclick="openPDF(currentActaUrl)">📄 Ver PDF</button>
                     <button class="btn btn-secondary" onclick="closeAIModal()">Cerrar</button>
                 </div>
             </div>
         </div>
         
-        <!-- Modal de consulta IA m&uacute;ltiple -->
+        <!-- Modal de consulta IA múltiple -->
         <div id="multiActasAIModal" class="modal" style="display: none;">
             <div class="modal-content modal-large">
                 <div class="modal-header">
-                    <h3>🤖 Consulta IA - M&uacute;ltiples Actas</h3>
+                    <h3>🤖 Consulta IA - Múltiples Actas</h3>
                     <button class="modal-close" onclick="window.MultiAIModal.close()">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -169,17 +171,17 @@
                         <div id="selectedActasList" class="selected-actas-list"></div>
                     </div>
                     
-                    <!-- &Aacute;rea de consulta -->
+                    <!-- Área de consulta -->
                     <div class="ai-query-section">
                         <label for="multiAIQuery">Pregunta sobre las actas seleccionadas:</label>
                         <textarea id="multiAIQuery" 
                                   class="ai-query-input" 
-                                  placeholder="Ejemplo: &iquest;Cu&aacute;les fueron los temas principales tratados en estos plenos? &iquest;Qu&eacute; presupuestos se aprobaron? &iquest;Hubo votaciones en contra?"
+                                  placeholder="Ejemplo: ¿Cuáles fueron los temas principales tratados en estos plenos? ¿Qué presupuestos se aprobaron? ¿Hubo votaciones en contra?"
                                   rows="4"></textarea>
                         <div class="query-suggestions">
-                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('&iquest;Cu&aacute;les fueron los temas principales?')">💡 Temas principales</button>
-                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('&iquest;Qu&eacute; presupuestos se aprobaron?')">💰 Presupuestos</button>
-                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('&iquest;Hubo votaciones en contra?')">🗳️ Votaciones</button>
+                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('¿Cuáles fueron los temas principales?')">💡 Temas principales</button>
+                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('¿Qué presupuestos se aprobaron?')">💰 Presupuestos</button>
+                            <button class="suggestion-btn" onclick="window.MultiAIModal.setSuggestion('¿Hubo votaciones en contra?')">🗳️ Votaciones</button>
                         </div>
                         <button id="askMultiAIBtn" class="btn btn-primary" onclick="window.MultiAIManager.askMultiAI()">
                             🤖 Preguntar a la IA
@@ -188,25 +190,25 @@
                     
                     <!-- Respuesta de IA -->
                     <div id="multiAIResponse" class="ai-response" style="display: none;">
-                        <h4>📋 Respuesta An&aacute;lisis M&uacute;ltiple:</h4>
+                        <h4>📋 Respuesta Análisis Múltiple:</h4>
                         <div id="multiAIResponseText"></div>
                     </div>
                     
-                    <!-- Historial de consultas m&uacute;ltiples -->
+                    <!-- Historial de consultas múltiples -->
                     <div id="multiQueryHistory" class="query-history" style="display: none;">
-                        <h4>📚 Historial de Consultas M&uacute;ltiples:</h4>
+                        <h4>📚 Historial de Consultas Múltiples:</h4>
                         <div id="multiHistoryList"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn" onclick="window.MultiSelector.selectAll()">☑️ Seleccionar Todas</button>
-                    <button class="btn" onclick="window.MultiSelector.clearSelection()">❌ Limpiar Selecci&oacute;n</button>
+                    <button class="btn" onclick="window.MultiSelector.clearSelection()">❌ Limpiar Selección</button>
                     <button class="btn btn-secondary" onclick="window.MultiAIModal.close()">Cerrar</button>
                 </div>
             </div>
         </div>
         
-        <!-- Secci&oacute;n de administraci&oacute;n -->
+        <!-- Sección de administración -->
         <div id="adminSection" class="admin-section">
             <h2 style="margin-bottom: 30px; color: #2c3e50;">
                 Subir Nueva Acta
@@ -219,7 +221,7 @@
                            accept=".pdf" multiple
                            class="file-input">
                     <small style="color: #666; display: block; margin-top: 0.5rem; font-weight: 500;">
-                        Tama&ntilde;o m&aacute;ximo: 50 MB por archivo. Puedes seleccionar m&uacute;ltiples archivos.
+                        Tamaño máximo: 50 MB por archivo. Puedes seleccionar múltiples archivos.
                     </small>
                 </div>
                 
@@ -230,7 +232,7 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary">
-                    <span class="btn-icon">&#128196;</span> Subir Acta
+                    <span class="btn-icon">📄</span> Subir Acta
                 </button>
             </form>
             
@@ -253,60 +255,60 @@
         </div>
     </div>
     
-    <!-- Bot&oacute;n de volver -->
+    <!-- Botón de volver -->
     <a href="#" class="back-button" id="backButton" onclick="goBack()">
-        &#8592; Volver
+        ← Volver
     </a>
     
-    <!-- Configuraci&oacute;n -->
+    <!-- Configuración -->
     <script src="config.js"></script>
     
-    <!-- Integraci&oacute;n OpenAI (opcional) -->
+    <!-- Integración OpenAI (opcional) -->
     <script src="openai_integration.js"></script>
     
-    <!-- M&oacute;dulos de la aplicaci&oacute;n -->
+    <!-- Módulos de la aplicación -->
     <script src="js/core/config.js"></script>
     <script src="js/core/utils.js"></script>
     <script src="js/auth/auth.js"></script>
     <script src="js/ui/navigation.js"></script>
     
-    <!-- M&oacute;dulos de Actas -->
+    <!-- Módulos de Actas -->
     <script src="js/actas/actas-manager.js"></script>
     <script src="js/actas/search.js"></script>
     <script src="js/actas/delete.js"></script>
     
-    <!-- M&oacute;dulos de Upload -->
+    <!-- Módulos de Upload -->
     <script src="js/upload/file-manager.js"></script>
     <script src="js/upload/upload-manager.js"></script>
     
-    <!-- M&oacute;dulos de IA -->
+    <!-- Módulos de IA -->
     <script src="js/ai/ai-modal.js"></script>
     <script src="js/ai/ai-history.js"></script>
     <script src="js/ai/ai-manager.js"></script>
     
-    <!-- M&oacute;dulos de IA M&uacute;ltiple -->
+    <!-- Módulos de IA Múltiple -->
     <script src="js/ai/multi-selector.js"></script>
     <script src="js/ai/multi-modal.js"></script>
     <script src="js/ai/multi-manager.js"></script>
     <script src="js/ai/multi-history.js"></script>
     
-    <!-- M&oacute;dulos de Procesamiento -->
+    <!-- Módulos de Procesamiento -->
     <script src="js/processing/stats-manager.js"></script>
     <script src="js/processing/batch-processor.js"></script>
     
-    <!-- M&oacute;dulos de Administraci&oacute;n -->
+    <!-- Módulo de Reordenamiento -->
     <script src="js/admin/reorder-manager.js"></script>
     
     <!-- JavaScript -->
     <script>
-        // Configuraci&oacute;n desde m&uacute;ltiples fuentes
-        // Las variables globales se establecen al cargar los m&oacute;dulos
+        // Configuración desde múltiples fuentes
+        // Las variables globales se establecen al cargar los módulos
         let SUPABASE_URL, SUPABASE_ANON_KEY, PASSWORD_USER, PASSWORD_ADMIN, OPENAI_API_KEY, AI_MODEL;
         
-        // Estado de la aplicaci&oacute;n (gestionado por m&oacute;dulos)
+        // Estado de la aplicación (gestionado por módulos)
         // currentView y userRole son gestionados por Navigation.js y Auth.js
         
-        // Funciones de autenticaci&oacute;n
+        // Funciones de autenticación
         function authenticate(password) {
             if (password === PASSWORD_ADMIN) {
                 userRole = 'admin';
@@ -325,7 +327,7 @@
             document.getElementById('adminSection').style.display = 'none';
             document.getElementById('backButton').style.display = 'none';
             
-            // Mostrar informaci&oacute;n del usuario
+            // Mostrar información del usuario
             const userRoleElement = document.getElementById('userRole');
             const adminButton = document.getElementById('adminButton');
             
@@ -360,22 +362,26 @@
             document.getElementById('authMessage').innerHTML = '';
         }
         
-        // Funciones de navegaci&oacute;n
+        // Funciones de navegación
         function showActas() {
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('actasSection').style.display = 'block';
             document.getElementById('adminSection').style.display = 'none';
             document.getElementById('backButton').style.display = 'block';
             
+            // ===== LÓGICA DE REORDENAMIENTO =====
             // Mostrar/ocultar botón de reordenamiento según rol
             const reorderButton = document.getElementById('reorderButton');
             if (reorderButton) {
                 if (userRole === 'admin') {
                     reorderButton.style.display = 'inline-block';
+                    console.log('✅ Botón de reordenamiento activado para admin');
                 } else {
                     reorderButton.style.display = 'none';
+                    console.log('👤 Botón de reordenamiento oculto para usuario normal');
                 }
             }
+            // ===== FIN LÓGICA DE REORDENAMIENTO =====
             
             // Cargar actas usando el nuevo módulo
             if (window.ActasManager && window.ActasManager.loadActas) {
@@ -406,17 +412,17 @@
             if (url) {
                 window.open(url, '_blank');
             } else {
-                alert('El PDF no est&aacute; disponible');
+                alert('El PDF no está disponible');
             }
         }
         
         // Sistema AI gestionado por módulos ai-modal.js, ai-manager.js, ai-history.js
         // Sistema de procesamiento gestionado por módulos stats-manager.js, batch-processor.js
         
-        // Inicializaci&oacute;n de m&oacute;dulos
+        // Inicialización de módulos
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                // Cargar configuraci&oacute;n desde Coolify (window.APP_CONFIG) o fallback
+                // Cargar configuración desde Coolify (window.APP_CONFIG) o fallback
                 // Coolify genera config.js que crea window.APP_CONFIG
                 window.SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
                 window.SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
@@ -433,12 +439,12 @@
                 OPENAI_API_KEY = window.OPENAI_API_KEY;
                 AI_MODEL = window.AI_MODEL;
                 
-                // Verificar configuraci&oacute;n cr&iacute;tica
+                // Verificar configuración crítica
                 if (!window.SUPABASE_ANON_KEY) {
                     console.warn('⚠️ SUPABASE_ANON_KEY no configurada');
                 }
                 
-                // Debug: mostrar configuraci&oacute;n cargada
+                // Debug: mostrar configuración cargada
                 console.log('🚀 Variables globales cargadas:', {
                     SUPABASE_URL: window.SUPABASE_URL,
                     SUPABASE_ANON_KEY: window.SUPABASE_ANON_KEY ? '***configurada***' : 'NO CONFIGURADA',
@@ -448,7 +454,7 @@
                     entorno: window.location.hostname.includes('local') ? 'desarrollo' : 'producción'
                 });
                 
-                // Inicializar m&oacute;dulos
+                // Inicializar módulos
                 if (window.Auth) window.Auth.initialize();
                 if (window.Navigation) window.Navigation.initialize();
                 if (window.ActasManager) window.ActasManager.initialize();
@@ -460,7 +466,7 @@
                 if (window.AIHistory) window.AIHistory.initialize();
                 if (window.AIManager) window.AIManager.initialize();
                 
-                // M&oacute;dulos de IA M&uacute;ltiple
+                // Módulos de IA Múltiple
                 if (window.MultiSelector) window.MultiSelector.initialize();
                 if (window.MultiAIModal) window.MultiAIModal.initialize();
                 if (window.MultiAIManager) window.MultiAIManager.initialize();
@@ -469,12 +475,16 @@
                 if (window.StatsManager) window.StatsManager.initialize();
                 if (window.BatchProcessor) window.BatchProcessor.initialize();
                 
-                // Módulos de administración
-                if (window.ReorderManager) window.ReorderManager.initialize();
+                // ===== INICIALIZAR REORDER MANAGER =====
+                if (window.ReorderManager) {
+                    window.ReorderManager.initialize();
+                    console.log('✅ ReorderManager inicializado correctamente');
+                }
+                // ===== FIN INICIALIZAR REORDER MANAGER =====
                 
-                console.log('✅ Aplicaci&oacute;n inicializada correctamente');
+                console.log('🚀 Aplicación inicializada correctamente');
             } catch (error) {
-                console.error('❌ Error inicializando aplicaci&oacute;n:', error);
+                console.error('❌ Error inicializando aplicación:', error);
             }
         });
     </script>

@@ -329,10 +329,10 @@ window.ReorderManager = {
         const currentItem = items[index];
         const previousItem = items[index - 1];
         
-        console.log(`🔄 Intercambiando posiciones: item ${index} (${currentItem.dataset.actaId}) sube, item ${index - 1} (${previousItem.dataset.actaId}) baja una posición`);
+        console.log(`🔄 Moviendo hacia arriba: item ${index} (${currentItem.dataset.actaId}) sube a posición ${index - 1}`);
         
-        // Intercambiar posiciones: mover el elemento actual antes del anterior
-        // (efecto visual: el elemento actual "sube" una posición)
+        // Mover el elemento actual antes del anterior
+        // (efecto visual: el elemento actual "sube" exactamente 1 posición)
         actasList.insertBefore(currentItem, previousItem);
         
         this.updateOrder();
@@ -362,11 +362,11 @@ window.ReorderManager = {
         const currentItem = items[index];
         const nextItem = items[index + 1];
         
-        console.log(`🔄 Intercambiando posiciones: item ${index + 1} (${nextItem.dataset.actaId}) sube, item ${index} (${currentItem.dataset.actaId}) baja una posición`);
+        console.log(`🔄 Moviendo hacia abajo: item ${index} (${currentItem.dataset.actaId}) baja a posición ${index + 1}`);
         
-        // Intercambiar posiciones: mover el siguiente elemento antes del actual
-        // (efecto visual: el elemento actual "baja" una posición)
-        actasList.insertBefore(nextItem, currentItem);
+        // Mover el elemento actual después del siguiente
+        // (efecto visual: el elemento actual "baja" exactamente 1 posición)
+        actasList.insertBefore(currentItem, nextItem.nextSibling);
         
         this.updateOrder();
     },

@@ -24,26 +24,20 @@ window.ReorderManager = {
         
         // Usar delegación de eventos para manejar clicks en botones de flecha
         actasList.addEventListener('click', (e) => {
-            console.log('🔍 DEBUG Event delegation click:', e.target.className, e.target.tagName);
-            
             // Verificar si se hizo click en un botón de mover hacia arriba
             if (e.target.classList.contains('btn-move-up')) {
                 e.preventDefault();
-                e.stopPropagation(); // Evitar propagación
-                console.log('🔼 DEBUG: Click en btn-move-up detectado');
+                e.stopPropagation();
                 
                 const actaItem = e.target.closest('.acta-item');
                 if (actaItem) {
                     const currentIndex = this.getCurrentIndex(actaItem);
-                    console.log(`🔼 Delegated click: Moviendo hacia arriba desde posición: ${currentIndex}`);
                     
                     // Deshabilitar temporalmente el botón para evitar dobles clicks
                     e.target.disabled = true;
                     setTimeout(() => e.target.disabled = false, 500);
                     
                     this.moveUp(currentIndex);
-                } else {
-                    console.log('❌ No se encontró .acta-item padre');
                 }
                 return;
             }
@@ -51,21 +45,17 @@ window.ReorderManager = {
             // Verificar si se hizo click en un botón de mover hacia abajo
             if (e.target.classList.contains('btn-move-down')) {
                 e.preventDefault();
-                e.stopPropagation(); // Evitar propagación
-                console.log('🔽 DEBUG: Click en btn-move-down detectado');
+                e.stopPropagation();
                 
                 const actaItem = e.target.closest('.acta-item');
                 if (actaItem) {
                     const currentIndex = this.getCurrentIndex(actaItem);
-                    console.log(`🔽 Delegated click: Moviendo hacia abajo desde posición: ${currentIndex}`);
                     
                     // Deshabilitar temporalmente el botón para evitar dobles clicks
                     e.target.disabled = true;
                     setTimeout(() => e.target.disabled = false, 500);
                     
                     this.moveDown(currentIndex);
-                } else {
-                    console.log('❌ No se encontró .acta-item padre');
                 }
                 return;
             }
@@ -341,8 +331,6 @@ window.ReorderManager = {
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
         const items = Array.from(actasList.children);
         
-        console.log(`📋 DEBUG Antes movimiento: [${items.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
-        
         if (index >= items.length) {
             console.error(`❌ Índice fuera de rango: ${index} >= ${items.length}`);
             return;
@@ -350,8 +338,6 @@ window.ReorderManager = {
         
         const currentItem = items[index];
         const previousItem = items[index - 1];
-        
-        console.log(`🔄 ANTES: ${previousItem.dataset.actaId.slice(-4)} en posición ${index}, ${currentItem.dataset.actaId.slice(-4)} en posición ${index + 1}`);
         
         // MÉTODO CORRECTO: Intercambio simple de elementos adyacentes
         // Crear un nodo temporal para hacer el intercambio
@@ -369,21 +355,17 @@ window.ReorderManager = {
         // 4. Remover nodo temporal
         actasList.removeChild(tempNode);
         
-        // Verificar después del movimiento
+        // Verificar que el movimiento fue correcto
         const newItems = Array.from(actasList.children);
-        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
-        
         const newIndexOfMoved = newItems.findIndex(item => item.dataset.actaId === currentItem.dataset.actaId);
-        console.log(`📊 ${currentItem.dataset.actaId.slice(-4)} se movió de posición ${index + 1} a posición ${newIndexOfMoved + 1} (cambio: ${newIndexOfMoved - index})`);
         
         if (newIndexOfMoved - index !== -1) {
             console.error(`❌ ERROR: El elemento se movió ${newIndexOfMoved - index} posiciones en lugar de -1`);
-        } else {
-            console.log(`✅ CORRECTO: Movimiento de exactamente 1 posición hacia arriba`);
+            return;
         }
         
-        // Usar setTimeout para asegurar que el DOM esté completamente estable
-        setTimeout(() => this.updateOrder(), 0);
+        console.log(`✅ Movimiento exitoso: 1 posición hacia arriba`);
+        this.updateOrder();
     },
     
     /**
@@ -394,8 +376,6 @@ window.ReorderManager = {
         
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
         const items = Array.from(actasList.children);
-        
-        console.log(`📋 DEBUG Antes movimiento: [${items.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
         
         if (index >= items.length - 1) {
             console.log(`❌ No se puede mover hacia abajo: índice ${index} es el último`);
@@ -409,8 +389,6 @@ window.ReorderManager = {
         
         const currentItem = items[index];
         const nextItem = items[index + 1];
-        
-        console.log(`🔄 ANTES: ${currentItem.dataset.actaId.slice(-4)} en posición ${index + 1}, ${nextItem.dataset.actaId.slice(-4)} en posición ${index + 2}`);
         
         // MÉTODO CORRECTO: Intercambio simple de elementos adyacentes
         // Crear un nodo temporal para hacer el intercambio
@@ -428,21 +406,17 @@ window.ReorderManager = {
         // 4. Remover nodo temporal
         actasList.removeChild(tempNode);
         
-        // Verificar después del movimiento
+        // Verificar que el movimiento fue correcto
         const newItems = Array.from(actasList.children);
-        console.log(`📋 DEBUG Después movimiento: [${newItems.map((item, i) => `${i}:${item.dataset.actaId.slice(-4)}`).join(', ')}]`);
-        
         const newIndexOfMoved = newItems.findIndex(item => item.dataset.actaId === currentItem.dataset.actaId);
-        console.log(`📊 ${currentItem.dataset.actaId.slice(-4)} se movió de posición ${index + 1} a posición ${newIndexOfMoved + 1} (cambio: ${newIndexOfMoved - index})`);
         
         if (newIndexOfMoved - index !== 1) {
             console.error(`❌ ERROR: El elemento se movió ${newIndexOfMoved - index} posiciones en lugar de 1`);
-        } else {
-            console.log(`✅ CORRECTO: Movimiento de exactamente 1 posición`);
+            return;
         }
         
-        // Usar setTimeout para asegurar que el DOM esté completamente estable
-        setTimeout(() => this.updateOrder(), 0);
+        console.log(`✅ Movimiento exitoso: 1 posición hacia abajo`);
+        this.updateOrder();
     },
     
     /**
@@ -474,13 +448,10 @@ window.ReorderManager = {
         
         // Actualizar números de orden en UI y estados de botones
         items.forEach((item, index) => {
-            console.log(`🔧 Actualizando item ${index}: ${item.dataset.actaId}`);
-            
             // Actualizar número de orden
             const orderNumber = item.querySelector('.order-number');
             if (orderNumber) {
                 orderNumber.textContent = index + 1;
-                console.log(`📊 Número actualizado a: ${index + 1}`);
             }
             
             // Actualizar estado de botones
@@ -488,17 +459,15 @@ window.ReorderManager = {
             const downBtn = item.querySelector('.btn-move-down');
             
             if (upBtn) {
-                const shouldDisableUp = index === 0;
-                upBtn.disabled = shouldDisableUp;
-                console.log(`🔼 Botón subir ${shouldDisableUp ? 'deshabilitado' : 'habilitado'} para item ${index}`);
+                upBtn.disabled = index === 0;
             }
             
             if (downBtn) {
-                const shouldDisableDown = index === items.length - 1;
-                downBtn.disabled = shouldDisableDown;
-                console.log(`🔽 Botón bajar ${shouldDisableDown ? 'deshabilitado' : 'habilitado'} para item ${index}`);
+                downBtn.disabled = index === items.length - 1;
             }
         });
+        
+        console.log(`📋 UI actualizada para ${items.length} items`);
         
         console.log('💾 Procediendo a guardar orden en base de datos');
         
@@ -510,8 +479,7 @@ window.ReorderManager = {
      * Guardar orden en base de datos
      */
     async saveOrderToDatabase(items) {
-        console.log('💾 Guardando nuevo orden en Supabase...');
-        console.log(`📝 Actualizando ${items.length} actas`);
+        console.log(`💾 Guardando nuevo orden de ${items.length} actas en Supabase...`);
         
         try {
             const updates = items.map((item, index) => ({
@@ -519,12 +487,8 @@ window.ReorderManager = {
                 orden_manual: index + 1
             }));
             
-            console.log('📋 Updates a realizar:', updates);
-            
             // Actualizar cada acta individualmente
             for (const update of updates) {
-                console.log(`🔄 Actualizando acta ${update.id} con orden ${update.orden_manual}`);
-                
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`, {
                     method: 'PATCH',
                     headers: {
@@ -540,7 +504,7 @@ window.ReorderManager = {
                 }
             }
             
-            console.log('✅ Orden guardado exitosamente');
+            console.log('✅ Orden guardado exitosamente en base de datos');
             
         } catch (error) {
             console.error('❌ Error guardando orden:', error);

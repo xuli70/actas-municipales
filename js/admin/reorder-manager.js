@@ -96,9 +96,9 @@ window.ReorderManager = {
         // Restaurar UI normal
         this.restoreNormalUI();
         
-        // Recargar actas con orden actualizado
-        if (window.ActasManager && window.ActasManager.loadActas) {
-            window.ActasManager.loadActas();
+        // Recargar actas con orden personalizado actualizado
+        if (window.ActasManager && window.ActasManager.loadActasWithCustomOrder) {
+            window.ActasManager.loadActasWithCustomOrder();
         }
         
         // Ocultar botón cancelar, mostrar botón reordenar
@@ -505,6 +505,17 @@ window.ReorderManager = {
             }
             
             console.log('✅ Orden guardado exitosamente en base de datos');
+            
+            // Recargar la vista para sincronizar con el estado real de la base de datos
+            if (this.reorderMode && window.ActasManager && window.ActasManager.loadActasWithCustomOrder) {
+                console.log('🔄 Recargando vista para sincronizar con base de datos...');
+                await window.ActasManager.loadActasWithCustomOrder();
+                
+                // Re-aplicar controles de reordenamiento después de recargar
+                setTimeout(() => {
+                    this.updateUIForReorderMode();
+                }, 100);
+            }
             
         } catch (error) {
             console.error('❌ Error guardando orden:', error);

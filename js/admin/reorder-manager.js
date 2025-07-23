@@ -493,6 +493,13 @@ window.ReorderManager = {
                 const headers = window.getApiHeaders();
                 const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
                 
+                // Debug: verificar headers y autenticación
+                console.log('🔍 Headers para PATCH:', JSON.stringify(headers, null, 2));
+                console.log('🔍 Estado de autenticación:', window.Auth?.state);
+                console.log('🔍 Token en sessionStorage:', sessionStorage.getItem('session_token'));
+                console.log('🔍 URL de la petición:', `${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`);
+                console.log('🔍 Body de la petición:', JSON.stringify({ orden_manual: update.orden_manual }));
+                
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`, {
                     method: 'PATCH',
                     headers: headers,
@@ -500,7 +507,10 @@ window.ReorderManager = {
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Error actualizando acta ${update.id}`);
+                    // Debug: capturar detalles del error
+                    const errorText = await response.text();
+                    console.error(`❌ Error PATCH ${response.status} ${response.statusText}:`, errorText);
+                    throw new Error(`Error actualizando acta ${update.id}: ${response.status} ${response.statusText}`);
                 }
             }
             

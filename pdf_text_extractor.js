@@ -81,23 +81,12 @@ window.PDFTextExtractor = {
         
         // Buscar elementos clave de actas municipales
         const patterns = {
-            temas: /(?:punto|tema|asunto)\s*\d*[\.:\-]?\s*([^\.]{20,150}\.)/gi,
             acuerdos: /(?:se\s+(?:aprueba|adopta|acuerda)|acuerdo|decisión|resolución)\s*:?\s*([^\.]{20,200}\.)/gi,
             presupuestos: /(?:presupuesto|importe|cantidad|euros?|€)\s*[^\.]{0,100}(?:\d+[.,]\d+|\d+)\s*(?:euros?|€)?[^\.]{0,50}\./gi
         };
         
         let summary = '';
         let usedText = new Set();
-        
-        // Extraer temas tratados
-        const temasMatches = Array.from(cleanText.matchAll(patterns.temas));
-        if (temasMatches.length > 0) {
-            const tema = temasMatches[0][1].trim();
-            if (!usedText.has(tema.toLowerCase())) {
-                summary += `Tema: ${tema} `;
-                usedText.add(tema.toLowerCase());
-            }
-        }
         
         // Extraer acuerdos principales
         const acuerdosMatches = Array.from(cleanText.matchAll(patterns.acuerdos));

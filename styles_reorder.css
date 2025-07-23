@@ -1,0 +1,232 @@
+/* Estilos específicos para controles de reordenamiento */
+/* Estos estilos se incluirán en styles.css o se cargarán por separado */
+
+/* Modo reordenamiento */
+.reorder-mode {
+    border: 2px solid #f39c12;
+    border-radius: 8px;
+    background: rgba(243, 156, 18, 0.1);
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Instrucciones de reordenamiento - COMENTADO PARA MEJORAR VISUALIZACIÓN EN MÓVIL */
+/*
+.reorder-instructions {
+    background: linear-gradient(135deg, #3498db 0%, #f39c12 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.reorder-instructions .instructions-content {
+    max-width: none;
+}
+
+.reorder-instructions h4 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.reorder-instructions p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+*/
+
+/* Items de acta en modo reordenamiento */
+.acta-item.reorderable {
+    position: relative;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    margin: 10px 0;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: move;
+}
+
+.acta-item.reorderable:hover {
+    border-color: #f39c12;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.acta-item.dragging {
+    opacity: 0.7;
+    transform: scale(1.02);
+    z-index: 1000;
+}
+
+/* Handle de arrastre */
+.drag-handle {
+    position: absolute;
+    left: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 40px;
+    background: #f39c12;
+    color: white;
+    border-radius: 15px 0 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    font-weight: bold;
+    font-size: 14px;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.drag-handle:hover {
+    background: #e67e22;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Controles de orden (botones arriba/abajo) */
+.order-controls {
+    position: absolute;
+    right: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: white;
+    padding: 8px;
+    border-radius: 8px;
+    border: 2px solid #3498db;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.btn-move-up, 
+.btn-move-down {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    background: #3498db;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-move-up:hover:not(:disabled) {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-move-down:hover:not(:disabled) {
+    background: #2980b9;
+    transform: translateY(2px);
+}
+
+.btn-move-up:disabled,
+.btn-move-down:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-move-up:active:not(:disabled),
+.btn-move-down:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+/* Número de orden */
+.order-number {
+    background: #2c3e50;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 24px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px 0;
+}
+
+/* Botones de reordenamiento en la interfaz */
+.btn-reorder, 
+.btn-cancel-reorder {
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-reorder:hover,
+.btn-cancel-reorder:hover {
+    background: #e67e22;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-cancel-reorder {
+    background: #e74c3c;
+}
+
+.btn-cancel-reorder:hover {
+    background: #c0392b;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .drag-handle {
+        left: -10px;
+        width: 25px;
+        height: 35px;
+        font-size: 12px;
+    }
+    
+    .order-controls {
+        right: -40px;
+        padding: 6px;
+    }
+    
+    .btn-move-up, 
+    .btn-move-down {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+    }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .acta-item.reorderable {
+        background: #374151;
+        border-color: #f39c12;
+    }
+    
+    .order-controls {
+        background: #374151;
+        border-color: #f39c12;
+    }
+    
+    .order-number {
+        background: #f39c12;
+        color: #1f2937;
+    }
+}

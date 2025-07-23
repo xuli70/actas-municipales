@@ -1905,7 +1905,8 @@ label {
     background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
 }
 
-/* Instrucciones de reordenamiento */
+/* Instrucciones de reordenamiento - COMENTADO PARA MEJORAR VISUALIZACIÓN EN MÓVIL */
+/*
 .reorder-instructions {
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 2px solid #f59e0b;
@@ -1929,6 +1930,7 @@ label {
     margin: var(--spacing-sm) 0;
     font-weight: 500;
 }
+*/
 
 /* Modo reordenamiento activo */
 .actas-list.reorder-mode {
@@ -2135,7 +2137,8 @@ label {
         color: #d1d5db;
     }
     
-    /* Modo reordenamiento en modo oscuro */
+    /* Modo reordenamiento en modo oscuro - COMENTADO PARA MEJORAR VISUALIZACIÓN EN MÓVIL */
+    /*
     .reorder-instructions {
         background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
         border-color: #f59e0b;
@@ -2148,6 +2151,7 @@ label {
     .instructions-content p {
         color: #d1d5db;
     }
+    */
     
     .actas-list.reorder-mode {
         background: #1f2937;

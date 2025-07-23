@@ -163,8 +163,8 @@ window.ReorderManager = {
             this.addReorderControls(item, index);
         });
         
-        // Mostrar instrucciones
-        this.showReorderInstructions();
+        // Mostrar instrucciones - COMENTADO PARA MEJORAR VISUALIZACIÓN EN MÓVIL
+        // this.showReorderInstructions();
         
         // Ocultar botón reordenar, mostrar botón cancelar
         const reorderBtn = document.querySelector('.btn-reorder');
@@ -529,7 +529,9 @@ window.ReorderManager = {
     
     /**
      * Mostrar instrucciones de reordenamiento
+     * COMENTADO PARA MEJORAR VISUALIZACIÓN EN MÓVIL
      */
+    /*
     showReorderInstructions() {
         const actasList = document.getElementById('actasList');
         
@@ -551,6 +553,7 @@ window.ReorderManager = {
         
         instructions.style.display = 'block';
     },
+    */
     
     /**
      * Restaurar UI normal
@@ -562,9 +565,9 @@ window.ReorderManager = {
         // Remover clase de modo reordenamiento
         actasList.classList.remove('reorder-mode');
         
-        // Ocultar instrucciones
-        const instructions = document.querySelector('.reorder-instructions');
-        if (instructions) instructions.style.display = 'none';
+        // Ocultar instrucciones - COMENTADO PARA MEJORAR VISUALIZACIÓN EN MÓVIL
+        // const instructions = document.querySelector('.reorder-instructions');
+        // if (instructions) instructions.style.display = 'none';
         
         // Remover controles de reordenamiento
         const dragHandles = actasList.querySelectorAll('.drag-handle');

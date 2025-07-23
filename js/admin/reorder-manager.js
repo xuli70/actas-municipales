@@ -323,6 +323,12 @@ window.ReorderManager = {
      */
     moveUp(index) {
         console.log(`🔼 MoveUp llamado con índice: ${index}`);
+        console.log(`🔍 Estado _updating: ${this._updating}`);
+        
+        if (this._updating) {
+            console.log('⏳ MoveUp cancelado: ya hay una actualización en progreso');
+            return;
+        }
         
         if (index <= 0) {
             console.log(`❌ No se puede mover hacia arriba: índice ${index} es el primero`);
@@ -366,6 +372,9 @@ window.ReorderManager = {
         }
         
         console.log(`✅ Movimiento exitoso: 1 posición hacia arriba`);
+        
+        // Marcar como en actualización antes de llamar updateOrder
+        this._updating = true;
         this.updateOrder();
     },
     
@@ -374,6 +383,12 @@ window.ReorderManager = {
      */
     moveDown(index) {
         console.log(`🔽 MoveDown llamado con índice: ${index}`);
+        console.log(`🔍 Estado _updating: ${this._updating}`);
+        
+        if (this._updating) {
+            console.log('⏳ MoveDown cancelado: ya hay una actualización en progreso');
+            return;
+        }
         
         const actasList = document.getElementById('actasList').querySelector('.actas-list');
         const items = Array.from(actasList.children);
@@ -417,6 +432,9 @@ window.ReorderManager = {
         }
         
         console.log(`✅ Movimiento exitoso: 1 posición hacia abajo`);
+        
+        // Marcar como en actualización antes de llamar updateOrder
+        this._updating = true;
         this.updateOrder();
     },
     
@@ -424,12 +442,11 @@ window.ReorderManager = {
      * Actualizar orden después de cambios
      */
     async updateOrder() {
-        // Prevenir múltiples ejecuciones simultáneas
-        if (this._updating) {
-            console.log('⏳ updateOrder ya se está ejecutando, ignorando llamada duplicada');
+        // Ya está protegido por _updating en moveUp/moveDown
+        if (this._updating !== true) {
+            console.log('⏳ updateOrder llamado sin _updating activado, cancelando');
             return;
         }
-        this._updating = true;
         
         console.log('🔄 Iniciando actualización de orden');
         

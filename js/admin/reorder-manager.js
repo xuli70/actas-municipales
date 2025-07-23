@@ -119,11 +119,14 @@ window.ReorderManager = {
             await window.ActasManager.loadActasWithCustomOrder();
             
             // Obtener las actas cargadas desde Supabase para uso interno
+            const headers = window.getApiHeaders ? window.getApiHeaders() : {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            };
+            
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nullslast,fecha.desc`, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
+                headers: headers
             });
             
             if (!response.ok) throw new Error('Error al cargar actas');
@@ -490,13 +493,15 @@ window.ReorderManager = {
             
             // Actualizar cada acta individualmente
             for (const update of updates) {
+                const headers = window.getApiHeaders ? window.getApiHeaders() : {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                };
+                
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`, {
                     method: 'PATCH',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: headers,
                     body: JSON.stringify({ orden_manual: update.orden_manual })
                 });
                 

@@ -81,12 +81,14 @@ async function loadActas() {
     actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
     
     try {
+        const headers = window.getApiHeaders ? window.getApiHeaders() : {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+        };
+        
         const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc&select=*`, {
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            }
+            headers: headers
         });
         
         if (!response.ok) {
@@ -226,14 +228,16 @@ async function uploadToStorage(file, fileName) {
 // Crear registro en la base de datos
 async function createActaRecord(actaData) {
     try {
+        const headers = window.getApiHeaders ? window.getApiHeaders() : {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+        };
+        headers['Prefer'] = 'return=representation';
+        
         const response = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {
             method: 'POST',
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
-            },
+            headers: headers,
             body: JSON.stringify(actaData)
         });
         

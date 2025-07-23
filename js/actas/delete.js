@@ -17,12 +17,15 @@ window.DeleteManager = {
         
         try {
             // Eliminar de la base de datos
+            const headers = window.getApiHeaders ? window.getApiHeaders() : {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            };
+            
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${actaId}`, {
                 method: 'DELETE',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
+                headers: headers
             });
             
             if (!response.ok) {

@@ -14,23 +14,79 @@ window.Auth = {
     /**
      * Autentica al usuario con la contraseña proporcionada
      */
-    authenticate(password) {
+    async authenticate(password) {
         if (!password) return null;
         
         const PASSWORD_ADMIN = window.APP_CONFIG?.PASSWORD_ADMIN || window.PASSWORD_ADMIN || 'admin123';
         const PASSWORD_USER = window.APP_CONFIG?.PASSWORD_USER || window.PASSWORD_USER || 'usuario123';
         
+        let role = null;
+        let dbRole = null;
+        
         if (password === PASSWORD_ADMIN) {
-            this.state.userRole = 'admin';
-            this.state.isAuthenticated = true;
-            return 'admin';
+            role = 'admin';
+            dbRole = 'administrador';
         } else if (password === PASSWORD_USER) {
-            this.state.userRole = 'user';
-            this.state.isAuthenticated = true;
-            return 'user';
+            role = 'user';
+            dbRole = 'usuario_publico';
+        }
+        
+        if (role) {
+            // Crear sesión temporal en la base de datos
+            const sessionToken = await this.createSession(dbRole);
+            if (sessionToken) {
+                this.state.userRole = role;
+                this.state.isAuthenticated = true;
+                return role;
+            }
         }
         
         return null;
+    },
+
+    /**
+     * Crea una sesión temporal en Supabase
+     */
+    async createSession(role) {
+        try {
+            const token = crypto.randomUUID();
+            const sessionHours = parseInt(window.APP_CONFIG?.SESSION_DURATION_HOURS || '8');
+            const expiresAt = new Date(Date.now() + sessionHours * 60 * 60 * 1000); // Duración configurable
+            
+            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || window.SUPABASE_URL || 'https://supmcp.axcsol.com';
+            const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY || '';
+            
+            // Guardar en Supabase
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/sesiones_temporales`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    token: token,
+                    rol: role,
+                    ip_address: null, // Se puede agregar después
+                    user_agent: navigator.userAgent,
+                    expires_at: expiresAt.toISOString()
+                })
+            });
+            
+            if (response.ok) {
+                // Guardar token localmente
+                sessionStorage.setItem('session_token', token);
+                console.log('✅ Sesión temporal creada exitosamente');
+                return token;
+            } else {
+                console.error('❌ Error creando sesión temporal:', response.status);
+                return null;
+            }
+            
+        } catch (error) {
+            console.error('❌ Error creando sesión temporal:', error);
+            return null;
+        }
     },
 
     /**
@@ -71,6 +127,9 @@ window.Auth = {
         this.state.userRole = null;
         this.state.isAuthenticated = false;
         
+        // Limpiar token de sesión
+        sessionStorage.removeItem('session_token');
+        
         // Limpiar historial de consultas IA de la sesión
         if (window.AIHistory && window.AIHistory.clearSession) {
             window.AIHistory.clearSession();
@@ -97,7 +156,7 @@ window.Auth = {
             window.currentView = 'auth';
         }
         
-        console.log('✅ Sesión cerrada y historial de consultas limpiado');
+        console.log('✅ Sesión cerrada, token eliminado y historial de consultas limpiado');
     },
 
     /**
@@ -105,6 +164,26 @@ window.Auth = {
      */
     isAdmin() {
         return this.state.userRole === 'admin';
+    },
+
+    /**
+     * Obtiene headers con token de sesión para llamadas API
+     */
+    getApiHeaders() {
+        const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY || '';
+        const sessionToken = sessionStorage.getItem('session_token');
+        
+        const headers = {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+        };
+        
+        if (sessionToken) {
+            headers['x-session-token'] = sessionToken;
+        }
+        
+        return headers;
     },
 
     /**
@@ -140,7 +219,7 @@ window.Auth = {
             return;
         }
         
-        const role = this.authenticate(password);
+        const role = await this.authenticate(password);
         
         if (role) {
             if (window.Utils) {
@@ -169,6 +248,7 @@ window.Auth = {
 window.authenticate = window.Auth.authenticate.bind(window.Auth);
 window.showMainMenu = window.Auth.showMainMenu.bind(window.Auth);
 window.logout = window.Auth.logout.bind(window.Auth);
+window.getApiHeaders = window.Auth.getApiHeaders.bind(window.Auth);
 
 // Mantener variable global userRole para compatibilidad
 Object.defineProperty(window, 'userRole', {

@@ -92,7 +92,7 @@ window.UploadManager = {
         console.log('🔍 Estado de autenticación para INSERT:', window.Auth?.state);
         console.log('🔍 Headers para INSERT:', {
             'Content-Type': dbHeaders['Content-Type'],
-            'x-session-token': dbHeaders['x-session-token'] ? '***TOKEN_PRESENT***' : 'NO_TOKEN',
+            'x-session-token': dbHeaders['x-session-token'] ? `***${dbHeaders['x-session-token'].substring(0,8)}...***` : 'NO_TOKEN',
             'apikey': dbHeaders['apikey'] ? '***KEY_PRESENT***' : 'NO_KEY'
         });
         

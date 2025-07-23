@@ -29,6 +29,7 @@ window.SearchManager = {
             const searchQuery = encodeURIComponent(`*${searchTerm}*`);
             
             const headers = window.getApiHeaders();
+            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?busqueda_texto=ilike.${searchQuery}&order=created_at.desc`, {
                 headers: headers

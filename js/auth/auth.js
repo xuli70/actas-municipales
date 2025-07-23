@@ -187,7 +187,8 @@ window.Auth = {
             'Content-Type': 'application/json'
         };
         
-        if (sessionToken) {
+        // Solo agregar token si existe y es válido
+        if (sessionToken && sessionToken.trim() !== '') {
             headers['x-session-token'] = sessionToken;
         }
         

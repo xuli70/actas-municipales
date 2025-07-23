@@ -13,6 +13,7 @@ window.ActasManager = {
         
         try {
             const headers = window.getApiHeaders();
+            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc`, {
                 headers: headers
@@ -45,6 +46,7 @@ window.ActasManager = {
         try {
             // Usar orden manual con fallback a fecha - Solo para modo reordenamiento
             const headers = window.getApiHeaders();
+            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nullslast,fecha.desc`, {
                 headers: headers

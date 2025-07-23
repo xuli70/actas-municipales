@@ -18,6 +18,7 @@ window.DeleteManager = {
         try {
             // Eliminar de la base de datos
             const headers = window.getApiHeaders();
+            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${actaId}`, {
                 method: 'DELETE',

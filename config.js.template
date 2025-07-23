@@ -10,25 +10,7 @@ window.APP_CONFIG = {
     PASSWORD_USER: '${PASSWORD_USER}',
     PASSWORD_ADMIN: '${PASSWORD_ADMIN}',
     OPENAI_API_KEY: '${OPENAI_API_KEY}',
-    AI_MODEL: '${AI_MODEL}',
-    
-    // Nuevas variables para seguridad RLS
-    SESSION_DURATION_HOURS: '${SESSION_DURATION_HOURS:-8}',
-    ENABLE_RLS_SECURITY: '${ENABLE_RLS_SECURITY:-true}'
-};
-
-// También inyectar en window.env para el nuevo sistema
-window.env = {
-    SUPABASE_URL: '${SUPABASE_URL}',
-    SUPABASE_ANON_KEY: '${SUPABASE_ANON_KEY}',
-    PASSWORD_USER: '${PASSWORD_USER}',
-    PASSWORD_ADMIN: '${PASSWORD_ADMIN}',
-    OPENAI_API_KEY: '${OPENAI_API_KEY}',
-    AI_MODEL: '${AI_MODEL}',
-    
-    // Nuevas variables para seguridad RLS
-    SESSION_DURATION_HOURS: '${SESSION_DURATION_HOURS:-8}',
-    ENABLE_RLS_SECURITY: '${ENABLE_RLS_SECURITY:-true}'
+    AI_MODEL: '${AI_MODEL}'
 };
 
 console.log('🚀 config.js generado desde variables de entorno (Coolify)');

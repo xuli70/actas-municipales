@@ -25,10 +25,7 @@ window.UploadManager = {
         const fileName = `acta_${timestamp}_${pdfFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
         
         // Subir archivo a Supabase Storage
-        const headers = window.getApiHeaders ? window.getApiHeaders() : {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        };
+        const headers = window.getApiHeaders();
         headers['x-upsert'] = 'true';
         delete headers['Content-Type']; // Dejar que el navegador establezca el Content-Type para archivos
         
@@ -88,11 +85,7 @@ window.UploadManager = {
             estado_procesamiento: textoExtraido ? 'completado' : 'pendiente'
         };
         
-        const dbHeaders = window.getApiHeaders ? window.getApiHeaders() : {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json'
-        };
+        const dbHeaders = window.getApiHeaders();
         dbHeaders['Prefer'] = 'return=representation';
         
         const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {

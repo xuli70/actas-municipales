@@ -28,11 +28,7 @@ window.SearchManager = {
             // Búsqueda directa en la tabla actas usando el campo busqueda_texto
             const searchQuery = encodeURIComponent(`*${searchTerm}*`);
             
-            const headers = window.getApiHeaders ? window.getApiHeaders() : {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            };
+            const headers = window.getApiHeaders();
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?busqueda_texto=ilike.${searchQuery}&order=created_at.desc`, {
                 headers: headers

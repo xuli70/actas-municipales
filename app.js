@@ -81,11 +81,7 @@ async function loadActas() {
     actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
     
     try {
-        const headers = window.getApiHeaders ? window.getApiHeaders() : {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json'
-        };
+        const headers = window.getApiHeaders();
         
         const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc&select=*`, {
             headers: headers
@@ -228,11 +224,7 @@ async function uploadToStorage(file, fileName) {
 // Crear registro en la base de datos
 async function createActaRecord(actaData) {
     try {
-        const headers = window.getApiHeaders ? window.getApiHeaders() : {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json'
-        };
+        const headers = window.getApiHeaders();
         headers['Prefer'] = 'return=representation';
         
         const response = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {

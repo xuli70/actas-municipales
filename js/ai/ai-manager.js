@@ -109,11 +109,7 @@ window.AIManager = {
                             textoActa = await window.PDFTextExtractor.extractTextFromUrl(actaData[0].archivo_url);
                             
                             // Actualizar el texto en la base de datos para futuras consultas
-                            const headers = window.getApiHeaders ? window.getApiHeaders() : {
-                                'apikey': SUPABASE_ANON_KEY,
-                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                                'Content-Type': 'application/json'
-                            };
+                            const headers = window.getApiHeaders();
                             
                             await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${actaId}`, {
                                 method: 'PATCH',

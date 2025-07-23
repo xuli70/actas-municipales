@@ -119,11 +119,7 @@ window.ReorderManager = {
             await window.ActasManager.loadActasWithCustomOrder();
             
             // Obtener las actas cargadas desde Supabase para uso interno
-            const headers = window.getApiHeaders ? window.getApiHeaders() : {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            };
+            const headers = window.getApiHeaders();
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nullslast,fecha.desc`, {
                 headers: headers
@@ -493,11 +489,7 @@ window.ReorderManager = {
             
             // Actualizar cada acta individualmente
             for (const update of updates) {
-                const headers = window.getApiHeaders ? window.getApiHeaders() : {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                };
+                const headers = window.getApiHeaders();
                 
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`, {
                     method: 'PATCH',

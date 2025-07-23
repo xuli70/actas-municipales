@@ -27,11 +27,7 @@ window.StatsManager = {
             }
             
             // Obtener estadísticas directamente de la tabla
-            const headers = window.getApiHeaders ? window.getApiHeaders() : {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            };
+            const headers = window.getApiHeaders();
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?select=estado_procesamiento`, {
                 headers: headers

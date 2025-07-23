@@ -12,11 +12,7 @@ window.ActasManager = {
         actasList.innerHTML = '<div class="loading">Cargando actas...</div>';
         
         try {
-            const headers = window.getApiHeaders ? window.getApiHeaders() : {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            };
+            const headers = window.getApiHeaders();
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=fecha.desc`, {
                 headers: headers
@@ -48,11 +44,7 @@ window.ActasManager = {
         
         try {
             // Usar orden manual con fallback a fecha - Solo para modo reordenamiento
-            const headers = window.getApiHeaders ? window.getApiHeaders() : {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            };
+            const headers = window.getApiHeaders();
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nullslast,fecha.desc`, {
                 headers: headers

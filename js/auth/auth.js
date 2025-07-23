@@ -50,11 +50,19 @@ window.Auth = {
     async createSession(role) {
         try {
             const token = crypto.randomUUID();
-            const sessionHours = parseInt(window.APP_CONFIG?.SESSION_DURATION_HOURS || '8');
-            const expiresAt = new Date(Date.now() + sessionHours * 60 * 60 * 1000); // Duración configurable
             
-            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || window.SUPABASE_URL || 'https://supmcp.axcsol.com';
-            const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY || '';
+            // Validar y usar duración de sesión con fallback seguro
+            const sessionHours = parseInt(window.APP_CONFIG?.SESSION_DURATION_HOURS) || 8;
+            const expiresAt = new Date(Date.now() + sessionHours * 60 * 60 * 1000);
+            
+            // Validar que la fecha sea válida antes de continuar
+            if (isNaN(expiresAt.getTime())) {
+                throw new Error('Fecha de expiración inválida');
+            }
+            
+            // Usar variables de entorno de Coolify directamente
+            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
+            const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
             
             // Guardar en Supabase
             const response = await fetch(`${SUPABASE_URL}/rest/v1/sesiones_temporales`, {
@@ -170,7 +178,7 @@ window.Auth = {
      * Obtiene headers con token de sesión para llamadas API
      */
     getApiHeaders() {
-        const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_ANON_KEY || '';
+        const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
         const sessionToken = sessionStorage.getItem('session_token');
         
         const headers = {

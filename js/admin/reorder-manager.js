@@ -12,7 +12,7 @@ window.ReorderManager = {
      */
     initialize() {
         this.setupEventListeners();
-        console.log('✅ ReorderManager inicializado');
+        console.log('✅ ReorderManager inicializado correctamente');
     },
     
     /**

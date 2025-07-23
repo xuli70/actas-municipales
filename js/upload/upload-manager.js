@@ -214,7 +214,7 @@ window.UploadManager = {
      */
     initialize() {
         this.initializeEventListeners();
-        console.log('✅ UploadManager inicializado');
+        console.log('✅ UploadManager inicializado correctamente');
     }
 };
 

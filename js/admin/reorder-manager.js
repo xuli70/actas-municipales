@@ -120,6 +120,7 @@ window.ReorderManager = {
             
             // Obtener las actas cargadas desde Supabase para uso interno
             const headers = window.getApiHeaders();
+            const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
             
             const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?order=orden_manual.asc.nullslast,fecha.desc`, {
                 headers: headers
@@ -490,6 +491,7 @@ window.ReorderManager = {
             // Actualizar cada acta individualmente
             for (const update of updates) {
                 const headers = window.getApiHeaders();
+                const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
                 
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`, {
                     method: 'PATCH',

@@ -47,6 +47,7 @@
     background: white;
     transition: all 0.3s ease;
     cursor: move;
+    padding-right: 120px; /* Espacio para los controles de orden */
 }
 
 .acta-item.reorderable:hover {
@@ -93,7 +94,7 @@
 /* Controles de orden (botones arriba/abajo) */
 .order-controls {
     position: absolute;
-    right: -50px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -201,7 +202,7 @@
     }
     
     .order-controls {
-        right: -40px;
+        right: 5px;
         padding: 6px;
     }
     

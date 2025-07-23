@@ -493,7 +493,7 @@ window.ReorderManager = {
                 const headers = window.getApiHeaders();
                 const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
                 
-                // Debug: verificar headers y autenticación
+                // Debug: verificar headers y autenticación de admin
                 console.log('🔍 Headers para PATCH:', JSON.stringify(headers, null, 2));
                 console.log('🔍 Estado de autenticación:', window.Auth?.state);
                 console.log('🔍 Token en sessionStorage:', sessionStorage.getItem('session_token'));

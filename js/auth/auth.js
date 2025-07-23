@@ -179,17 +179,20 @@ window.Auth = {
      */
     getApiHeaders() {
         const SUPABASE_ANON_KEY = window.APP_CONFIG?.SUPABASE_ANON_KEY || '';
-        const sessionToken = sessionStorage.getItem('session_token');
         
+        // Headers básicos para todas las peticiones
         const headers = {
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
             'Content-Type': 'application/json'
         };
         
-        // Solo agregar token si existe y es válido
-        if (sessionToken && sessionToken.trim() !== '') {
-            headers['x-session-token'] = sessionToken;
+        // Solo para usuarios autenticados, agregar token de sesión
+        if (this.state.isAuthenticated && this.state.userRole === 'admin') {
+            const sessionToken = sessionStorage.getItem('session_token');
+            if (sessionToken) {
+                headers['x-session-token'] = sessionToken;
+            }
         }
         
         return headers;

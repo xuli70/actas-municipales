@@ -88,6 +88,14 @@ window.UploadManager = {
         const dbHeaders = window.getApiHeaders();
         dbHeaders['Prefer'] = 'return=representation';
         
+        // Debug: verificar autenticación admin para INSERT acta
+        console.log('🔍 Estado de autenticación para INSERT:', window.Auth?.state);
+        console.log('🔍 Headers para INSERT:', {
+            'Content-Type': dbHeaders['Content-Type'],
+            'x-session-token': dbHeaders['x-session-token'] ? '***TOKEN_PRESENT***' : 'NO_TOKEN',
+            'apikey': dbHeaders['apikey'] ? '***KEY_PRESENT***' : 'NO_KEY'
+        });
+        
         const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {
             method: 'POST',
             headers: dbHeaders,

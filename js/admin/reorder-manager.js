@@ -510,7 +510,7 @@ window.ReorderManager = {
                 const headers = window.getApiHeaders();
                 const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
                 
-                // Debug: verificar headers y autenticación de admin
+                // Debug: verificar headers y autenticación admin para PATCH
                 // Debug headers (sin exponer claves privadas)
                 const safeHeaders = {
                     'Content-Type': headers['Content-Type'],

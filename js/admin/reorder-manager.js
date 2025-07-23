@@ -494,9 +494,15 @@ window.ReorderManager = {
                 const SUPABASE_URL = window.APP_CONFIG?.SUPABASE_URL || 'https://supmcp.axcsol.com';
                 
                 // Debug: verificar headers y autenticación de admin
-                console.log('🔍 Headers para PATCH:', JSON.stringify(headers, null, 2));
+                // Debug headers (sin exponer claves privadas)
+                const safeHeaders = {
+                    'Content-Type': headers['Content-Type'],
+                    'x-session-token': headers['x-session-token'] ? '***TOKEN_PRESENT***' : 'NO_TOKEN',
+                    'apikey': headers['apikey'] ? '***KEY_PRESENT***' : 'NO_KEY'
+                };
+                console.log('🔍 Headers para PATCH:', safeHeaders);
                 console.log('🔍 Estado de autenticación:', window.Auth?.state);
-                console.log('🔍 Token en sessionStorage:', sessionStorage.getItem('session_token'));
+                console.log('🔍 Token presente:', sessionStorage.getItem('session_token') ? 'SÍ' : 'NO');
                 console.log('🔍 URL de la petición:', `${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`);
                 console.log('🔍 Body de la petición:', JSON.stringify({ orden_manual: update.orden_manual }));
                 
@@ -516,16 +522,8 @@ window.ReorderManager = {
             
             console.log('✅ Orden guardado exitosamente en base de datos');
             
-            // Recargar la vista para sincronizar con el estado real de la base de datos
-            if (this.reorderMode && window.ActasManager && window.ActasManager.loadActasWithCustomOrder) {
-                console.log('🔄 Recargando vista para sincronizar con base de datos...');
-                await window.ActasManager.loadActasWithCustomOrder();
-                
-                // Re-aplicar controles de reordenamiento después de recargar
-                setTimeout(() => {
-                    this.updateUIForReorderMode();
-                }, 100);
-            }
+            // No recargar automáticamente para evitar conflictos
+            // El usuario puede salir y volver a entrar al modo reordenamiento si necesita sincronizar
             
         } catch (error) {
             console.error('❌ Error guardando orden:', error);

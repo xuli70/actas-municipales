@@ -322,8 +322,7 @@ window.ReorderManager = {
      * Mover acta hacia arriba
      */
     moveUp(index) {
-        console.log(`🔼 MoveUp llamado con índice: ${index}`);
-        console.log(`🔍 Estado _updating: ${this._updating}`);
+        // Mover acta una posición hacia arriba
         
         if (this._updating) {
             console.log('⏳ MoveUp cancelado: ya hay una actualización en progreso');
@@ -382,8 +381,7 @@ window.ReorderManager = {
      * Mover acta hacia abajo
      */
     moveDown(index) {
-        console.log(`🔽 MoveDown llamado con índice: ${index}`);
-        console.log(`🔍 Estado _updating: ${this._updating}`);
+        // Mover acta una posición hacia abajo
         
         if (this._updating) {
             console.log('⏳ MoveDown cancelado: ya hay una actualización en progreso');
@@ -512,16 +510,7 @@ window.ReorderManager = {
                 
                 // Debug: verificar headers y autenticación admin para PATCH
                 // Debug headers (sin exponer claves privadas)
-                const safeHeaders = {
-                    'Content-Type': headers['Content-Type'],
-                    'x-session-token': headers['x-session-token'] ? '***TOKEN_PRESENT***' : 'NO_TOKEN',
-                    'apikey': headers['apikey'] ? '***KEY_PRESENT***' : 'NO_KEY'
-                };
-                console.log('🔍 Headers para PATCH:', safeHeaders);
-                console.log('🔍 Estado de autenticación:', window.Auth?.state);
-                console.log('🔍 Token presente:', sessionStorage.getItem('session_token') ? 'SÍ' : 'NO');
-                console.log('🔍 URL de la petición:', `${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`);
-                console.log('🔍 Body de la petición:', JSON.stringify({ orden_manual: update.orden_manual }));
+                // Enviar actualización del orden manual
                 
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${update.id}`, {
                     method: 'PATCH',

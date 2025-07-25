@@ -191,7 +191,7 @@ window.Auth = {
         if (this.state.isAuthenticated && this.state.userRole === 'admin') {
             const sessionToken = sessionStorage.getItem('session_token');
             if (sessionToken) {
-                headers['x-session-token'] = sessionToken;
+                headers['session-token'] = sessionToken;
             }
         }
         

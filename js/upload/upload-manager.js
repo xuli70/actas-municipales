@@ -69,7 +69,23 @@ window.UploadManager = {
             // Continuar sin texto extraído
         }
         
-        // Insertar acta en la base de datos con valores simplificados
+        // Verificar si ya existe un acta con el mismo nombre
+        const dbHeaders = window.getApiHeaders();
+        
+        // Buscar acta existente por título/nombre de archivo
+        const checkResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas?titulo=eq.${encodeURIComponent(pdfFile.name)}`, {
+            method: 'GET',
+            headers: dbHeaders
+        });
+        
+        if (!checkResponse.ok) {
+            throw new Error('Error al verificar actas existentes');
+        }
+        
+        const existingActas = await checkResponse.json();
+        const actaExists = existingActas.length > 0;
+        
+        // Preparar datos del acta
         const actaData = {
             titulo: pdfFile.name,
             fecha: fechaActual,
@@ -85,25 +101,44 @@ window.UploadManager = {
             estado_procesamiento: textoExtraido ? 'completado' : 'pendiente'
         };
         
-        const dbHeaders = window.getApiHeaders();
-        dbHeaders['Prefer'] = 'return=representation';
+        let insertResponse;
+        let operationType;
         
-        // Headers configurados para insertar acta
-        
-        const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {
-            method: 'POST',
-            headers: dbHeaders,
-            body: JSON.stringify(actaData)
-        });
+        if (actaExists) {
+            // UPDATE: Actualizar acta existente
+            const existingActa = existingActas[0];
+            operationType = 'actualizada';
+            
+            dbHeaders['Prefer'] = 'return=representation';
+            insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas?id=eq.${existingActa.id}`, {
+                method: 'PATCH',
+                headers: dbHeaders,
+                body: JSON.stringify(actaData)
+            });
+        } else {
+            // INSERT: Crear nueva acta
+            operationType = 'creada';
+            
+            dbHeaders['Prefer'] = 'return=representation';
+            insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/actas`, {
+                method: 'POST',
+                headers: dbHeaders,
+                body: JSON.stringify(actaData)
+            });
+        }
         
         if (!insertResponse.ok) {
             const errorData = await insertResponse.text();
-            console.error('Error al insertar acta:', errorData);
-            throw new Error('Error al guardar el acta');
+            console.error(`Error al ${operationType === 'creada' ? 'insertar' : 'actualizar'} acta:`, errorData);
+            throw new Error(`Error al ${operationType === 'creada' ? 'guardar' : 'actualizar'} el acta`);
         }
         
-        // Éxito - retornar datos del acta insertada
-        return await insertResponse.json();
+        // Éxito - retornar datos del acta con información de la operación
+        const actaResult = await insertResponse.json();
+        return {
+            ...actaResult,
+            _operationType: operationType // Información adicional sobre la operación realizada
+        };
     },
 
     /**
@@ -154,10 +189,17 @@ window.UploadManager = {
             window.FileManager.updateFileStatus(i, '<span style="color: #3498db;">🔄 Subiendo...</span>');
             
             try {
-                await this.uploadSingleFile(file);
+                const result = await this.uploadSingleFile(file);
                 successCount++;
-                window.FileManager.updateFileStatus(i, '<span style="color: #27ae60;">✅ Subido correctamente</span>');
-                results.push({ file: file.name, status: 'success' });
+                
+                // Mostrar mensaje específico según la operación realizada
+                const operationType = result._operationType || 'subida';
+                const statusMessage = operationType === 'actualizada' 
+                    ? '<span style="color: #f39c12;">🔄 Actualizada correctamente</span>'
+                    : '<span style="color: #27ae60;">✅ Subida correctamente</span>';
+                
+                window.FileManager.updateFileStatus(i, statusMessage);
+                results.push({ file: file.name, status: 'success', operation: operationType });
             } catch (error) {
                 errorCount++;
                 window.FileManager.updateFileStatus(i, `<span style="color: #e74c3c;">❌ Error: ${error.message}</span>`);

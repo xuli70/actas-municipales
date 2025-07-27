@@ -1623,7 +1623,8 @@ label {
 }
 
 .btn-start-selection {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    /* background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);*/
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
     color: white;
     padding: 12px 24px;
     font-size: 16px;
@@ -1637,7 +1638,8 @@ label {
 }
 
 .btn-start-selection:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    /*background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);*/
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }

@@ -25,7 +25,13 @@ window.AIModal = {
     /**
      * Abre el modal de consulta IA
      */
-    open(actaId, title, url, summary) {
+    async open(actaId, title, url, summary) {
+        // Verificar acceso con PIN si es necesario (solo usuarios)
+        if (window.AIPinAuth && !await window.AIPinAuth.checkAccess()) {
+            console.log('❌ Acceso denegado - PIN no validado');
+            return;
+        }
+        
         this.currentActaId = actaId;
         this.currentActaUrl = url;
         
@@ -96,9 +102,9 @@ window.AIModal = {
 };
 
 // Funciones globales para compatibilidad
-window.openAIModal = function(actaId, title, url, summary) {
+window.openAIModal = async function(actaId, title, url, summary) {
     if (window.AIModal) {
-        window.AIModal.open(actaId, title, url, summary);
+        await window.AIModal.open(actaId, title, url, summary);
     }
 };
 

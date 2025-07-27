@@ -10,5 +10,6 @@ window.APP_CONFIG = {
     PASSWORD_USER: 'usuario123',                  // Reemplazar con contraseña real
     PASSWORD_ADMIN: 'admin123',                   // Reemplazar con contraseña real
     OPENAI_API_KEY: '',                          // Opcional - para funciones IA
-    AI_MODEL: 'gpt-4o-mini'                      // Opcional - modelo IA por defecto
+    AI_MODEL: 'gpt-4o-mini',                     // Opcional - modelo IA por defecto
+    AI_ACCESS_PIN: '1234'                        // PIN de 4 dígitos para consultas IA (solo usuarios)
 };

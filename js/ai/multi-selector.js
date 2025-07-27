@@ -18,7 +18,13 @@ window.MultiSelector = {
     /**
      * Activar modo selección
      */
-    enterSelectionMode() {
+    async enterSelectionMode() {
+        // Verificar acceso con PIN si es necesario (solo usuarios)
+        if (window.AIPinAuth && !await window.AIPinAuth.checkAccess()) {
+            console.log('❌ Acceso denegado - PIN no validado');
+            return;
+        }
+        
         this.selectionMode = true;
         this.selectedActas = [];
         

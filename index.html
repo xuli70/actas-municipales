@@ -157,6 +157,35 @@
             </div>
         </div>
         
+        <!-- Modal de PIN para acceso IA -->
+        <div id="aiPinModal" class="modal" style="display: none;">
+            <div class="modal-content modal-small">
+                <div class="modal-header">
+                    <h3>🔐 Acceso a Consultas IA</h3>
+                </div>
+                <div class="modal-body">
+                    <p style="text-align: center; margin-bottom: 20px;">
+                        Ingrese el PIN de 4 dígitos para acceder a las consultas de IA
+                    </p>
+                    <div class="form-group" style="text-align: center;">
+                        <input type="text" 
+                               id="aiPinInput" 
+                               class="pin-input" 
+                               maxlength="4" 
+                               pattern="\d{4}" 
+                               placeholder="0000"
+                               autocomplete="off"
+                               style="font-size: 2rem; text-align: center; width: 150px; letter-spacing: 10px;">
+                    </div>
+                    <div id="aiPinError" class="error" style="display: none; text-align: center; margin-top: 10px;"></div>
+                </div>
+                <div class="modal-footer" style="justify-content: center;">
+                    <button id="aiPinSubmit" class="btn btn-primary">Confirmar</button>
+                    <button id="aiPinCancel" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- Modal de consulta IA múltiple -->
         <div id="multiActasAIModal" class="modal" style="display: none;">
             <div class="modal-content modal-large">
@@ -270,6 +299,7 @@
     <script src="js/core/config.js"></script>
     <script src="js/core/utils.js"></script>
     <script src="js/auth/auth.js"></script>
+    <script src="js/auth/ai-pin-auth.js"></script>
     <script src="js/ui/navigation.js"></script>
     
     <!-- Módulos de Actas -->

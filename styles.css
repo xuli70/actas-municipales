@@ -1128,6 +1128,31 @@ label {
     border: 2px solid var(--color-border);
 }
 
+.modal-content.modal-small {
+    max-width: 400px;
+    padding: var(--spacing-xl);
+}
+
+/* PIN Input Styles */
+.pin-input {
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    font-family: monospace;
+    transition: all 0.3s ease;
+}
+
+.pin-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(46, 87, 153, 0.2);
+}
+
+.pin-input::placeholder {
+    color: var(--color-text-light);
+    opacity: 0.5;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;

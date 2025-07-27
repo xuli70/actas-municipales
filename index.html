@@ -14,7 +14,7 @@
 <body>
     <header>
         <h1>Actas Municipales</h1>
-        <p class="subtitle">Plenos del Ayuntamiento</p>
+        <p class="subtitle">Tablón de anuncios</p>
     </header>
     
     <div class="container">
@@ -54,14 +54,14 @@
         
         <!-- Lista de actas -->
         <div id="actasSection" style="display: none;">
-            <h2 style="text-align: center; margin-bottom: 30px; color: white;">
-                Actas Disponibles
-            </h2>
+            <h1 style="text-align: center; margin-bottom: 30px; color: white;">
+                Documentos Disponibles
+            </h1>
             
             <!-- Consulta IA Múltiple -->
             <div class="multi-ai-controls">
                 <button class="btn-start-selection" onclick="window.MultiSelector.enterSelectionMode()">
-                    ☑️ Seleccionar Actas para Consulta IA
+                    ☑️ Seleccionar Documentos para Consulta IA
                 </button>
                 <!-- ===== BOTONES DE REORDENAMIENTO ===== -->
                 <button class="btn-reorder" id="reorderButton" onclick="window.ReorderManager.enterReorderMode()" style="display: none;">
@@ -94,7 +94,7 @@
                         <input type="text" 
                                id="searchInput" 
                                class="search-input" 
-                               placeholder="Buscar en actas..." 
+                               placeholder="Buscar en documentos..." 
                                autocomplete="off">
                         <button type="submit" class="btn-search">
                             🔍 Buscar

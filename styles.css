@@ -137,9 +137,11 @@ h1 {
 }
 
 .subtitle {
-    font-size: var(--font-size-xl);
-    opacity: 0.95;
-    font-weight: 300;
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: -0.025em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     position: relative;
     z-index: 1;
 }
